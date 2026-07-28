@@ -1,0 +1,91 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model PlannerItem {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId    String   @default("couple-1")
+  title       String
+  description String?
+  type        String   // Event, Bucket, Task, Anniversary, Birthday, Reminder
+  status      String   @default("Planned") // Planned, In Progress, Completed, Overdue, Cancelled
+  priority    String   @default("Medium")  // Low, Medium, High, Critical
+  startDate   DateTime?
+  endDate     DateTime?
+  deadline    DateTime?
+  location    String?
+  color       String   @default("Hồng")
+  createdBy   String
+  assignedTo  String?
+  isRepeat    Boolean  @default(false)
+  repeatRule  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  checklists  PlannerChecklist[]
+  events      PlannerEvent[]
+  comments    PlannerComment[]
+  attachments PlannerAttachment[]
+  notifications Notification[]
+}
+
+model PlannerChecklist {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  plannerItemId String      @db.ObjectId
+  plannerItem   PlannerItem @relation(fields: [plannerItemId], references: [id], onDelete: Cascade)
+  title         String
+  isCompleted   Boolean     @default(false)
+  sortOrder     Int         @default(0)
+  createdAt     DateTime    @default(now())
+}
+
+model PlannerEvent {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  plannerItemId String      @db.ObjectId
+  plannerItem   PlannerItem @relation(fields: [plannerItemId], references: [id], onDelete: Cascade)
+  title         String
+  eventStart    DateTime
+  eventEnd      DateTime?
+  isAllDay      Boolean     @default(false)
+  isCompleted   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+}
+
+model PlannerComment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  plannerItemId String      @db.ObjectId
+  plannerItem   PlannerItem @relation(fields: [plannerItemId], references: [id], onDelete: Cascade)
+  userId        String
+  userName      String
+  userAvatar    String?
+  content       String
+  createdAt     DateTime    @default(now())
+}
+
+model PlannerAttachment {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  plannerItemId String      @db.ObjectId
+  plannerItem   PlannerItem @relation(fields: [plannerItemId], references: [id], onDelete: Cascade)
+  name          String
+  url           String
+  fileType      String
+  createdAt     DateTime    @default(now())
+}
+
+model Notification {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId      String       @default("couple-1")
+  userId        String
+  plannerItemId String?      @db.ObjectId
+  plannerItem   PlannerItem? @relation(fields: [plannerItemId], references: [id], onDelete: SetNull)
+  type          String
+  title         String
+  message       String
+  isRead        Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+}
