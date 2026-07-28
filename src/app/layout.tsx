@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     title: 'CouplePlanner',
   },
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: '/apple-icon.png',
+    apple: '/apple-icon.png',
   },
 };
 
