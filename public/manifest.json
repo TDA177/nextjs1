@@ -1,0 +1,18 @@
+{
+  "name": "Couple Planner - Anh & Em",
+  "short_name": "CouplePlanner",
+  "description": "Lịch & Kế Hoạch Đôi Dành Cho Anh ❤️ Em",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#f43f5e",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
