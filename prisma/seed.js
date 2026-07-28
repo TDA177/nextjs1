@@ -17,7 +17,61 @@ async function main() {
   const dec2026 = new Date('2026-12-30T00:00:00.000Z');
   const nov2026 = new Date('2026-11-10T00:00:00.000Z');
 
-  // Item 1: Bucket - Đi Nhật (Rule 5: Sub-Events, Checklist 3/5 60%)
+  // 1. Kỷ niệm ngày yêu nhau (25/12/2025)
+  await prisma.plannerItem.create({
+    data: {
+      coupleId: 'couple-1',
+      title: 'Kỷ niệm ngày yêu nhau ❤️',
+      description: 'Ngày hai đứa chính thức bên nhau 25/12/2025.',
+      type: 'Anniversary',
+      status: 'Planned',
+      priority: 'Critical',
+      startDate: new Date('2025-12-25T00:00:00.000Z'),
+      color: 'Hồng',
+      createdBy: 'Anh',
+      assignedTo: 'Both',
+      isRepeat: true,
+      repeatRule: 'Every Year'
+    }
+  });
+
+  // 2. Sinh nhật Em (05/03/2004)
+  await prisma.plannerItem.create({
+    data: {
+      coupleId: 'couple-1',
+      title: 'Sinh nhật Em 🎂',
+      description: 'Sinh nhật của Em (05/03/2004).',
+      type: 'Birthday',
+      status: 'Planned',
+      priority: 'High',
+      startDate: new Date('2004-03-05T00:00:00.000Z'),
+      color: 'Vàng',
+      createdBy: 'Anh',
+      assignedTo: 'Em',
+      isRepeat: true,
+      repeatRule: 'Every Year'
+    }
+  });
+
+  // 3. Sinh nhật Anh (17/07/2001)
+  await prisma.plannerItem.create({
+    data: {
+      coupleId: 'couple-1',
+      title: 'Sinh nhật Anh 🎂',
+      description: 'Sinh nhật của Anh (17/07/2001).',
+      type: 'Birthday',
+      status: 'Planned',
+      priority: 'High',
+      startDate: new Date('2001-07-17T00:00:00.000Z'),
+      color: 'Vàng',
+      createdBy: 'Em',
+      assignedTo: 'Anh',
+      isRepeat: true,
+      repeatRule: 'Every Year'
+    }
+  });
+
+  // Item 4: Bucket - Đi Nhật
   await prisma.plannerItem.create({
     data: {
       coupleId: 'couple-1',
@@ -88,7 +142,7 @@ async function main() {
     }
   });
 
-  // Item 2: Bucket - Chuẩn bị cưới
+  // Item 5: Bucket - Chuẩn bị cưới
   await prisma.plannerItem.create({
     data: {
       coupleId: 'couple-1',
@@ -133,7 +187,7 @@ async function main() {
     }
   });
 
-  // Item 3: Event - Đi xem phim
+  // Item 6: Event - Đi xem phim
   await prisma.plannerItem.create({
     data: {
       coupleId: 'couple-1',
@@ -149,43 +203,7 @@ async function main() {
     }
   });
 
-  // Item 4: Anniversary - Kỷ niệm 2 năm yêu nhau
-  await prisma.plannerItem.create({
-    data: {
-      coupleId: 'couple-1',
-      title: 'Kỷ niệm 2 năm yêu nhau ❤️',
-      description: 'Ăn tối lãng mạn tại nhà hàng rooftop view thành phố.',
-      type: 'Anniversary',
-      status: 'Planned',
-      priority: 'Critical',
-      startDate: new Date('2026-08-15T18:30:00.000Z'),
-      color: 'Hồng',
-      createdBy: 'Anh',
-      assignedTo: 'Both',
-      isRepeat: true,
-      repeatRule: 'Every Year'
-    }
-  });
-
-  // Item 5: Birthday - Sinh nhật Em 🎂
-  await prisma.plannerItem.create({
-    data: {
-      coupleId: 'couple-1',
-      title: 'Sinh nhật Em 🎂',
-      description: 'Tổ chức sinh nhật và tặng quà bất ngờ.',
-      type: 'Birthday',
-      status: 'Planned',
-      priority: 'High',
-      startDate: new Date('2026-08-28T00:00:00.000Z'),
-      color: 'Vàng',
-      createdBy: 'Anh',
-      assignedTo: 'Em',
-      isRepeat: true,
-      repeatRule: 'Every Year'
-    }
-  });
-
-  // Item 6: Bucket - Đi Đà Lạt ✈️
+  // Item 7: Bucket - Đi Đà Lạt ✈️
   await prisma.plannerItem.create({
     data: {
       coupleId: 'couple-1',
@@ -207,7 +225,7 @@ async function main() {
     }
   });
 
-  // Item 7: Bucket không có ngày (Rule 1: Maldives)
+  // Item 8: Bucket không có ngày (Rule 1: Maldives)
   await prisma.plannerItem.create({
     data: {
       coupleId: 'couple-1',
@@ -218,22 +236,6 @@ async function main() {
       priority: 'Low',
       color: 'Xanh',
       createdBy: 'Em',
-      assignedTo: 'Both'
-    }
-  });
-
-  // Item 8: Overdue Bucket (Rule 4)
-  await prisma.plannerItem.create({
-    data: {
-      coupleId: 'couple-1',
-      title: 'Khám sức khỏe tổng quát 🏥',
-      description: 'Khám sức khỏe định kỳ năm 2026.',
-      type: 'Task',
-      status: 'Overdue',
-      priority: 'Medium',
-      deadline: new Date('2026-06-01T00:00:00.000Z'),
-      color: 'Đỏ',
-      createdBy: 'Anh',
       assignedTo: 'Both'
     }
   });
