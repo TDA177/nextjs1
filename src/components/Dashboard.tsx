@@ -8,15 +8,31 @@ interface DashboardProps {
   onSelectItem: (item: any) => void;
 }
 
-const getCountdownDays = (dateStr: string | null) => {
+const getCountdownDays = (dateStr: string | null, type: string) => {
   if (!dateStr) return null;
   const now = new Date();
   now.setHours(0, 0, 0, 0);
-  const target = new Date(dateStr);
-  target.setHours(0, 0, 0, 0);
-  const diffTime = target.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
+  
+  const originalDate = new Date(dateStr);
+  originalDate.setHours(0, 0, 0, 0);
+
+  // Tính lặp lại hàng năm cho Anniversary và Birthday
+  if (type === 'Anniversary' || type === 'Birthday') {
+    const target = new Date(now.getFullYear(), originalDate.getMonth(), originalDate.getDate());
+    target.setHours(0, 0, 0, 0);
+
+    // Nếu ngày đó trong năm nay đã qua, đếm ngược cho năm sau
+    if (target.getTime() < now.getTime()) {
+      target.setFullYear(now.getFullYear() + 1);
+    }
+
+    const diffTime = target.getTime() - now.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
+  // Các loại khác đếm bình thường
+  const diffTime = originalDate.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
 export default function Dashboard({ items, onSelectItem }: DashboardProps) {
@@ -40,7 +56,7 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
 
   const upcomingCountdowns = items
     .filter((i) => (i.type === 'Anniversary' || i.type === 'Event' || i.type === 'Birthday') && (i.deadline || i.startDate))
-    .map(i => ({ ...i, daysLeft: getCountdownDays(i.startDate || i.deadline) }))
+    .map(i => ({ ...i, daysLeft: getCountdownDays(i.startDate || i.deadline, i.type) }))
     .filter(i => i.daysLeft !== null && i.daysLeft >= 0)
     .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0))
     .slice(0, 3);
@@ -223,7 +239,7 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
                         {item.status}
                       </span>
                       {(() => {
-                        const days = getCountdownDays(dateVal);
+                        const days = getCountdownDays(dateVal, item.type);
                         if (days !== null) {
                           if (days === 0) return <div className="text-[10px] text-amber-400 font-bold mt-1">Hôm nay</div>;
                           if (days > 0) return <div className="text-[10px] text-emerald-400 font-bold mt-1">Còn {days} ngày</div>;
