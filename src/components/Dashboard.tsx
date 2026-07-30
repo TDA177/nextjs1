@@ -1,12 +1,23 @@
 'use client';
 
-import React from 'react';
-import { CheckCircle2, Clock, AlertTriangle, ListTodo, Flame, Calendar, Award, Sparkles, Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle2, Clock, AlertTriangle, ListTodo, Flame, Calendar, Award, Sparkles, Heart, Timer } from 'lucide-react';
 
 interface DashboardProps {
   items: any[];
   onSelectItem: (item: any) => void;
 }
+
+const getCountdownDays = (dateStr: string | null) => {
+  if (!dateStr) return null;
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  const target = new Date(dateStr);
+  target.setHours(0, 0, 0, 0);
+  const diffTime = target.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
 
 export default function Dashboard({ items, onSelectItem }: DashboardProps) {
   const buckets = items.filter((i) => i.type === 'Bucket');
@@ -26,6 +37,13 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
     .filter((i) => i.deadline || i.startDate)
     .sort((a, b) => new Date(a.deadline || a.startDate).getTime() - new Date(b.deadline || b.startDate).getTime())
     .slice(0, 5);
+
+  const upcomingCountdowns = items
+    .filter((i) => (i.type === 'Anniversary' || i.type === 'Event' || i.type === 'Birthday') && (i.deadline || i.startDate))
+    .map(i => ({ ...i, daysLeft: getCountdownDays(i.startDate || i.deadline) }))
+    .filter(i => i.daysLeft !== null && i.daysLeft >= 0)
+    .sort((a, b) => (a.daysLeft || 0) - (b.daysLeft || 0))
+    .slice(0, 3);
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -123,6 +141,40 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
         </div>
       </div>
 
+      {/* Countdown Section */}
+      {upcomingCountdowns.length > 0 && (
+        <div className="glass-card rounded-3xl p-6 border border-slate-700/60 bg-gradient-to-br from-slate-900/80 to-slate-800/80">
+          <h3 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
+            <Timer className="w-5 h-5 text-amber-400" />
+            Đếm ngược sự kiện sắp tới
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {upcomingCountdowns.map(item => (
+              <div 
+                key={item.id} 
+                onClick={() => onSelectItem(item)}
+                className="relative overflow-hidden rounded-2xl p-5 bg-slate-800/50 border border-slate-700/50 hover:border-amber-500/50 transition-all cursor-pointer group"
+              >
+                <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-500/10 to-rose-500/10 rounded-bl-full -z-10 group-hover:scale-110 transition-transform" />
+                <div className="text-xs font-semibold text-amber-400 mb-1">{item.type}</div>
+                <div className="font-bold text-white text-lg truncate mb-3">{item.title}</div>
+                <div className="flex items-end gap-2">
+                  <span className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400">
+                    {item.daysLeft}
+                  </span>
+                  <span className="text-sm text-slate-400 pb-1">
+                    {item.daysLeft === 0 ? 'Hôm nay!' : 'ngày nữa'}
+                  </span>
+                </div>
+                <div className="text-xs text-slate-500 mt-2">
+                  {new Date(item.startDate || item.deadline).toLocaleDateString('vi-VN')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Secondary Detailed Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Upcoming Deadlines & Events */}
@@ -170,6 +222,15 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-700 text-slate-300 font-medium">
                         {item.status}
                       </span>
+                      {(() => {
+                        const days = getCountdownDays(dateVal);
+                        if (days !== null) {
+                          if (days === 0) return <div className="text-[10px] text-amber-400 font-bold mt-1">Hôm nay</div>;
+                          if (days > 0) return <div className="text-[10px] text-emerald-400 font-bold mt-1">Còn {days} ngày</div>;
+                          if (days < 0) return <div className="text-[10px] text-slate-500 font-bold mt-1">Đã qua {Math.abs(days)} ngày</div>;
+                        }
+                        return null;
+                      })()}
                     </div>
                   </div>
                 );

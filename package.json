@@ -12,6 +12,9 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/cli": "^8.4.2",
+    "@capacitor/core": "^8.4.2",
     "@prisma/client": "^5.21.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
@@ -23,6 +26,7 @@
     "tailwind-merge": "^2.5.4"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.17.0",
     "@types/react": "^18.3.11",
