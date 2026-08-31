@@ -7,6 +7,7 @@ import CoupleCalendar from '@/components/CoupleCalendar';
 import BucketList from '@/components/BucketList';
 import BucketDetailModal from '@/components/BucketDetailModal';
 import CreateItemModal from '@/components/CreateItemModal';
+import PeriodTrackerModal from '@/components/PeriodTrackerModal';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets'>('calendar');
@@ -15,6 +16,11 @@ export default function Home() {
   const [items, setItems] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Period Tracker states
+  const [periodSetting, setPeriodSetting] = useState<any | null>(null);
+  const [periodCycleInfo, setPeriodCycleInfo] = useState<any | null>(null);
+  const [showPeriodModal, setShowPeriodModal] = useState(false);
 
   // Modals state
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
@@ -43,6 +49,22 @@ export default function Home() {
     }
   };
 
+  // Fetch period settings & cycle info
+  const fetchPeriod = async () => {
+    try {
+      const res = await fetch('/api/period?coupleId=couple-1');
+      if (res.ok) {
+        const data = await res.json();
+        setPeriodSetting(data.setting || null);
+        setPeriodCycleInfo(data.cycleInfo || null);
+        // Refresh notifications since period check might have generated one
+        fetchNotifications();
+      }
+    } catch (e) {
+      console.error('Error fetching period settings:', e);
+    }
+  };
+
   // Fetch notifications
   const fetchNotifications = async () => {
     try {
@@ -58,6 +80,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchItems();
+    fetchPeriod();
   }, []);
 
   useEffect(() => {
@@ -91,6 +114,8 @@ export default function Home() {
           setCreateInitialDate(null);
           setShowCreateModal(true);
         }}
+        onOpenPeriodTracker={() => setShowPeriodModal(true)}
+        periodCycleInfo={periodCycleInfo}
         notificationsCount={unreadNotificationsCount}
         notifications={notifications}
         onMarkNotificationRead={handleMarkNotificationRead}
@@ -113,6 +138,9 @@ export default function Home() {
                   setCreateInitialDate(date);
                   setShowCreateModal(true);
                 }}
+                periodSetting={periodSetting}
+                periodCycleInfo={periodCycleInfo}
+                onOpenPeriodTracker={() => setShowPeriodModal(true)}
               />
             )}
 
@@ -131,6 +159,9 @@ export default function Home() {
               <Dashboard
                 items={items}
                 onSelectItem={(item) => setSelectedItem(item)}
+                periodSetting={periodSetting}
+                periodCycleInfo={periodCycleInfo}
+                onOpenPeriodTracker={() => setShowPeriodModal(true)}
               />
             )}
           </>
@@ -156,6 +187,18 @@ export default function Home() {
           onRefresh={fetchItems}
         />
       )}
+
+      {/* Period Tracker Modal */}
+      {showPeriodModal && (
+        <PeriodTrackerModal
+          initialSetting={periodSetting}
+          onClose={() => setShowPeriodModal(false)}
+          onRefresh={() => {
+            fetchPeriod();
+          }}
+        />
+      )}
     </div>
   );
 }
+

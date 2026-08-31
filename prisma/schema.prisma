@@ -89,3 +89,31 @@ model Notification {
   isRead        Boolean      @default(false)
   createdAt     DateTime     @default(now())
 }
+
+model PeriodSetting {
+  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId           String      @unique @default("couple-1")
+  startDate          DateTime    // Ngày bắt đầu kỳ kinh gần nhất
+  cycleLength        Int         @default(28) // Chu kỳ (mặc định 28 ngày)
+  periodDuration     Int         @default(5)  // Số ngày hành kinh (mặc định 5 ngày)
+  reminderDaysBefore Int         @default(3)  // Báo trước bao nhiêu ngày
+  partnerName        String      @default("Em")
+  notes              String?     // Ghi chú sở thích, triệu chứng
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  logs               PeriodLog[]
+}
+
+model PeriodLog {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  periodSettingId String        @db.ObjectId
+  periodSetting   PeriodSetting @relation(fields: [periodSettingId], references: [id], onDelete: Cascade)
+  date            DateTime
+  flow            String?       // Light, Medium, Heavy
+  mood            String?       // Happy, Sensitive, Tired, Cramps, Irritable
+  symptoms        String?       // Danh sách triệu chứng phân cách bởi dấu phẩy
+  notes           String?
+  createdAt       DateTime      @default(now())
+}
+

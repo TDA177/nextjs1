@@ -12,6 +12,8 @@ interface NavbarProps {
   notificationsCount: number;
   notifications: any[];
   onMarkNotificationRead: (id: string) => void;
+  onOpenPeriodTracker?: () => void;
+  periodCycleInfo?: any | null;
 }
 
 export const USERS = [
@@ -28,6 +30,8 @@ export default function Navbar({
   notificationsCount,
   notifications,
   onMarkNotificationRead,
+  onOpenPeriodTracker,
+  periodCycleInfo,
 }: NavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -90,11 +94,28 @@ export default function Navbar({
         </nav>
 
         {/* Actions & User Switcher */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Period Tracker Button */}
+          {onOpenPeriodTracker && (
+            <button
+              onClick={onOpenPeriodTracker}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-rose-300 border border-pink-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              title="Theo dõi chu kỳ nàng (Đếm ngược 28 ngày & Bí kíp chăm sóc)"
+            >
+              <span>🩸</span>
+              <span className="hidden sm:inline">Chu Kỳ Nàng</span>
+              {periodCycleInfo && (
+                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/30 text-rose-200 font-mono">
+                  {periodCycleInfo.statusBadgeText}
+                </span>
+              )}
+            </button>
+          )}
+
           {/* Create Button */}
           <button
             onClick={onOpenCreate}
-            className="flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white px-4 py-2.5 rounded-xl font-semibold shadow-lg shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 text-sm"
+            className="flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white px-3.5 sm:px-4 py-2.5 rounded-xl font-semibold shadow-lg shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 text-sm"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
             <span className="hidden sm:inline">Tạo Mục Mới</span>
@@ -180,7 +201,7 @@ export default function Navbar({
       </div>
 
       {/* Mobile Tab Switcher */}
-      <div className="md:hidden flex border-t border-slate-800 bg-slate-900/90 px-4 py-2 justify-around text-xs">
+      <div className="md:hidden flex border-t border-slate-800 bg-slate-900/90 px-3 py-2 justify-around text-xs">
         <button
           onClick={() => setActiveTab('calendar')}
           className={`flex flex-col items-center gap-1 py-1 ${activeTab === 'calendar' ? 'text-rose-400 font-bold' : 'text-slate-400'}`}
@@ -202,7 +223,17 @@ export default function Navbar({
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
         </button>
+        {onOpenPeriodTracker && (
+          <button
+            onClick={onOpenPeriodTracker}
+            className="flex flex-col items-center gap-1 py-1 text-pink-400 font-bold"
+          >
+            <span>🩸</span>
+            Chu Kỳ
+          </button>
+        )}
       </div>
     </header>
   );
 }
+

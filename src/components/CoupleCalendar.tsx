@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Heart, Plus, Sparkles, MapPin, CheckCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Heart, Plus, Sparkles, MapPin, CheckCircle, Eye, EyeOff } from 'lucide-react';
 import {
   format,
   addMonths,
@@ -16,16 +16,28 @@ import {
   isToday,
 } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { getCycleDayMarker, DayCycleMarker } from '@/lib/periodUtils';
 
 interface CoupleCalendarProps {
   items: any[];
   onSelectItem: (item: any) => void;
   onOpenCreateDate?: (date: Date) => void;
+  periodSetting?: any | null;
+  periodCycleInfo?: any | null;
+  onOpenPeriodTracker?: () => void;
 }
 
-export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }: CoupleCalendarProps) {
+export default function CoupleCalendar({
+  items,
+  onSelectItem,
+  onOpenCreateDate,
+  periodSetting,
+  periodCycleInfo,
+  onOpenPeriodTracker,
+}: CoupleCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [showPeriodOverlay, setShowPeriodOverlay] = useState<boolean>(true);
 
   const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
@@ -99,6 +111,15 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
   };
 
   const daySelectedItems = selectedDay ? getItemsForDay(selectedDay) : [];
+  const selectedDayCycleMarker =
+    selectedDay && periodSetting?.startDate
+      ? getCycleDayMarker(
+          selectedDay,
+          periodSetting.startDate,
+          periodSetting.cycleLength,
+          periodSetting.periodDuration
+        )
+      : null;
 
   return (
     <div className="space-y-6">
@@ -112,12 +133,38 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
             <h2 className="text-2xl font-black text-white capitalize">
               {format(currentMonth, 'MMMM yyyy', { locale: vi })}
             </h2>
-            <p className="text-xs text-slate-400">Lịch đôi - Sự kiện & Bucket hiển thị tự động (Rule 2)</p>
+            <p className="text-xs text-slate-400">Lịch đôi - Sự kiện, Bucket & Chu kỳ nàng (Rule 2)</p>
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="flex items-center gap-3">
+        {/* Navigation & Period Toggle Buttons */}
+        <div className="flex items-center gap-2.5 flex-wrap justify-end">
+          {periodSetting ? (
+            <button
+              type="button"
+              onClick={() => setShowPeriodOverlay(!showPeriodOverlay)}
+              className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 border transition-all ${
+                showPeriodOverlay
+                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
+                  : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
+              }`}
+              title="Bật/Tắt hiển thị chu kỳ kinh nguyệt trên lịch"
+            >
+              {showPeriodOverlay ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+              <span>Chu kỳ nàng 🩸</span>
+            </button>
+          ) : (
+            onOpenPeriodTracker && (
+              <button
+                type="button"
+                onClick={onOpenPeriodTracker}
+                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-semibold border border-rose-500/30 flex items-center gap-1"
+              >
+                <span>➕ Cài đặt chu kỳ 🩸</span>
+              </button>
+            )
+          )}
+
           <button
             onClick={() => setCurrentMonth(new Date())}
             className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-rose-300 border border-slate-700 transition-colors"
@@ -161,12 +208,27 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
             const isCurrMonth = isSameMonth(day, currentMonth);
             const isTodayDate = isToday(day);
 
+            const cycleMarker =
+              showPeriodOverlay && periodSetting?.startDate
+                ? getCycleDayMarker(
+                    day,
+                    periodSetting.startDate,
+                    periodSetting.cycleLength
+                  )
+                : null;
+
+            const isPeriodStartDay = cycleMarker?.type === 'period';
+
             return (
               <div
                 key={idx}
                 onClick={() => setSelectedDay(day)}
-                className={`min-h-[110px] sm:min-h-[130px] p-2 transition-all cursor-pointer flex flex-col justify-between group ${
-                  !isCurrMonth ? 'bg-slate-900/40 text-slate-600' : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800/60'
+                className={`min-h-[110px] sm:min-h-[130px] p-2 transition-all cursor-pointer flex flex-col justify-between group relative ${
+                  !isCurrMonth
+                    ? 'bg-slate-900/40 text-slate-600'
+                    : isPeriodStartDay
+                    ? 'bg-gradient-to-b from-rose-950/50 to-slate-900/90 text-slate-200 hover:bg-rose-900/40'
+                    : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800/60'
                 } ${isTodayDate ? 'ring-2 ring-rose-500/80 z-10 bg-rose-950/20' : ''}`}
               >
                 {/* Date header */}
@@ -175,6 +237,8 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
                     className={`text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center ${
                       isTodayDate
                         ? 'bg-rose-500 text-white shadow-md shadow-rose-500/40'
+                        : isPeriodStartDay
+                        ? 'bg-rose-500/30 text-rose-200 border border-rose-500/50'
                         : isCurrMonth
                         ? 'text-slate-300'
                         : 'text-slate-600'
@@ -182,11 +246,24 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
                   >
                     {format(day, 'd')}
                   </span>
-                  {dayItems.length > 0 && (
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                      {dayItems.length}
-                    </span>
-                  )}
+
+                  <div className="flex items-center gap-1">
+                    {/* Period Start Day Icon */}
+                    {isPeriodStartDay && (
+                      <span
+                        className="text-[11px] px-1.5 py-0.5 rounded-md bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold"
+                        title={cycleMarker?.label}
+                      >
+                        🩸 Đến tháng
+                      </span>
+                    )}
+
+                    {dayItems.length > 0 && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        {dayItems.length}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Items preview list */}
@@ -224,14 +301,14 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
       {/* Selected Day View Modal */}
       {selectedDay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
-          <div className="glass-modal rounded-3xl w-full max-w-lg p-6 border border-rose-500/30 shadow-2xl relative space-y-4">
+          <div className="glass-modal rounded-3xl w-full max-w-lg p-6 border border-rose-500/30 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-700/60 pb-3">
               <div>
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5 text-rose-400" />
                   {format(selectedDay, 'dd MMMM yyyy', { locale: vi })}
                 </h3>
-                <p className="text-xs text-slate-400">Danh sách tất cả kế hoạch trong ngày này</p>
+                <p className="text-xs text-slate-400">Danh sách tất cả kế hoạch & chu kỳ trong ngày này</p>
               </div>
               <button
                 onClick={() => setSelectedDay(null)}
@@ -241,10 +318,36 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
               </button>
             </div>
 
+            {/* If Selected Day is a Period Start Day */}
+            {selectedDayCycleMarker && (
+              <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/50 to-pink-950/40 border border-rose-500/40 text-xs flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="font-bold text-rose-300 flex items-center gap-1.5">
+                    🩸 Ngày Bắt Đầu Đến Tháng
+                  </div>
+                  <div className="text-slate-200 text-[11px]">
+                    Ngày bắt đầu chu kỳ của {periodSetting?.partnerName || 'Em'}. Nhớ mua đồ ngọt và pha trà ấm nhé! ❤️
+                  </div>
+                </div>
+                {onOpenPeriodTracker && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedDay(null);
+                      onOpenPeriodTracker();
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500 text-white text-[11px] font-bold hover:bg-rose-600 transition-colors shadow-sm flex-shrink-0"
+                  >
+                    Xem chu kỳ
+                  </button>
+                )}
+              </div>
+            )}
+
             <div className="max-h-96 overflow-y-auto space-y-3 pr-1">
               {daySelectedItems.length === 0 ? (
-                <div className="text-center py-8 text-slate-400">
-                  <p className="text-sm">Chưa có sự kiện nào cho ngày này.</p>
+                <div className="text-center py-6 text-slate-400">
+                  <p className="text-sm">Chưa có kế hoạch nào được tạo cho ngày này.</p>
                   {onOpenCreateDate && (
                     <button
                       onClick={() => {
@@ -295,3 +398,4 @@ export default function CoupleCalendar({ items, onSelectItem, onOpenCreateDate }
     </div>
   );
 }
+

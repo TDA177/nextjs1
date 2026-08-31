@@ -6,6 +6,9 @@ import { CheckCircle2, Clock, AlertTriangle, ListTodo, Flame, Calendar, Award, S
 interface DashboardProps {
   items: any[];
   onSelectItem: (item: any) => void;
+  periodSetting?: any | null;
+  periodCycleInfo?: any | null;
+  onOpenPeriodTracker?: () => void;
 }
 
 const getCountdownDays = (dateStr: string | null, type: string) => {
@@ -35,7 +38,13 @@ const getCountdownDays = (dateStr: string | null, type: string) => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
-export default function Dashboard({ items, onSelectItem }: DashboardProps) {
+export default function Dashboard({
+  items,
+  onSelectItem,
+  periodSetting,
+  periodCycleInfo,
+  onOpenPeriodTracker,
+}: DashboardProps) {
   const buckets = items.filter((i) => i.type === 'Bucket');
   const events = items.filter((i) => i.type === 'Event');
   const tasks = items.filter((i) => i.type === 'Task');
@@ -102,6 +111,52 @@ export default function Dashboard({ items, onSelectItem }: DashboardProps) {
               <div className="text-xs text-slate-400">Tiến độ tổng thể</div>
               <div className="text-lg font-bold text-white">{completedCount} / {totalItems} Hoàn thành</div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Period Cycle Tracker Widget Card */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-pink-950/40 via-rose-900/20 to-purple-950/40 border border-rose-500/30 p-6 glass-card shadow-xl">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="p-3.5 bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 rounded-2xl text-white shadow-lg shadow-rose-500/20 flex-shrink-0 animate-pulse">
+              <Heart className="w-6 h-6 fill-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                  {periodCycleInfo?.statusBadgeText || 'Chu kỳ 28 ngày'}
+                </span>
+                <h3 className="text-lg font-black text-white">
+                  Ngày Đến Tháng Của {periodSetting?.partnerName || 'Em'} 🌸
+                </h3>
+              </div>
+
+              {periodCycleInfo ? (
+                <div className="mt-1 space-y-0.5">
+                  <p className="text-sm font-bold text-rose-200">
+                    {periodCycleInfo.countdownText}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Kỳ kế tiếp: {new Date(periodCycleInfo.nextPeriodStartDate).toLocaleDateString('vi-VN')} • {periodCycleInfo.careTips?.[0]}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-400 mt-1">
+                  Chưa cài đặt ngày đến tháng. Nhấp để thiết lập ngày bắt đầu (chu kỳ 28 ngày) và nhận thông báo đếm ngược!
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <button
+              type="button"
+              onClick={onOpenPeriodTracker}
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-bold shadow-md shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2"
+            >
+              <span>{periodSetting ? '🩸 Xem & Chăm Sóc Nàng' : '➕ Cài Đặt Ngày Đến Tháng (28 Ngày)'}</span>
+            </button>
           </div>
         </div>
       </div>
