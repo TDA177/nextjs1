@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 
 /**
- * Tự động kiểm tra và tạo thông báo nếu sắp đến ngày đến tháng
+ * Tự động kiểm tra và tạo thông báo nếu sắp đến ngày của nàng
  */
 async function checkAndCreatePeriodNotification(setting: any, cycleInfo: any) {
   try {
@@ -17,11 +17,11 @@ async function checkAndCreatePeriodNotification(setting: any, cycleInfo: any) {
     let message = '';
 
     if (isPeriodStartToday) {
-      title = `🩸 Hôm nay là ngày đến tháng của ${setting.partnerName || 'Em'}`;
-      message = `Hôm nay là ngày bắt đầu kỳ mới. Đừng quên mua đồ ngọt, pha trà gừng và chuẩn bị túi sưởi cho người yêu nhé! ❤️`;
+      title = `🌸 Hôm nay là ngày đặc biệt của ${setting.partnerName || 'Em'}`;
+      message = `Hôm nay là ngày đặc biệt của nàng. Đừng quên mua đồ ngọt, pha trà ấm và chuẩn bị túi chườm sưởi ấm cho người yêu nhé! ❤️`;
     } else if (daysUntilNextPeriod > 0 && daysUntilNextPeriod <= reminderDays) {
-      title = `⚠️ Còn ${daysUntilNextPeriod} ngày nữa đến ngày đến tháng của ${setting.partnerName || 'Em'}`;
-      message = `Dự kiến ngày ${formattedNextDate} là ngày đến tháng. Bạn trai hãy chuẩn bị sẵn tâm lý kiên nhẫn, đồ ăn ngon và quà ngọt nhé! 🌸`;
+      title = `🌸 Còn ${daysUntilNextPeriod} ngày nữa đến ngày của ${setting.partnerName || 'Em'}`;
+      message = `Dự kiến ngày ${formattedNextDate} là ngày đặc biệt của nàng. Bạn trai hãy chuẩn bị sẵn tâm lý kiên nhẫn, đồ ăn ngon và quà ngọt nhé! 🌸`;
     }
 
     if (title && message) {

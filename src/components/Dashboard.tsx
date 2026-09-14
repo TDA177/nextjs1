@@ -125,10 +125,10 @@ export default function Dashboard({
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                  {periodCycleInfo?.statusBadgeText || 'Chu kỳ 28 ngày'}
+                  {periodCycleInfo?.statusBadgeText || 'Vòng lặp 28 ngày'}
                 </span>
                 <h3 className="text-lg font-black text-white">
-                  Ngày Đến Tháng Của {periodSetting?.partnerName || 'Em'} 🌸
+                  Góc Của {periodSetting?.partnerName || 'Em'} 🌸
                 </h3>
               </div>
 
@@ -143,7 +143,7 @@ export default function Dashboard({
                 </div>
               ) : (
                 <p className="text-xs text-slate-400 mt-1">
-                  Chưa cài đặt ngày đến tháng. Nhấp để thiết lập ngày bắt đầu (chu kỳ 28 ngày) và nhận thông báo đếm ngược!
+                  Chưa cài đặt ngày của nàng. Nhấp để thiết lập và nhận thông báo đếm ngược yêu thương!
                 </p>
               )}
             </div>
@@ -155,7 +155,7 @@ export default function Dashboard({
               onClick={onOpenPeriodTracker}
               className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-bold shadow-md shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 flex items-center gap-2"
             >
-              <span>{periodSetting ? '🩸 Xem & Chăm Sóc Nàng' : '➕ Cài Đặt Ngày Đến Tháng (28 Ngày)'}</span>
+              <span>{periodSetting ? '🌸 Xem & Chăm Sóc Nàng' : '➕ Cài Đặt Ngày Của Nàng'}</span>
             </button>
           </div>
         </div>

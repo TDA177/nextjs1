@@ -36,7 +36,7 @@ export const PERIOD_FOOD_TIPS = [
 ];
 
 /**
- * Tính toán chu kỳ 28 ngày (hoặc tùy chỉnh) - Chỉ tính ngày bắt đầu đến tháng
+ * Tính toán chu kỳ 28 ngày (hoặc tùy chỉnh) - Đếm ngày của nàng
  */
 export function calculateCycleInfo(
   startDateInput: Date | string,
@@ -85,17 +85,17 @@ export function calculateCycleInfo(
   let statusBadgeText = '';
 
   if (isPeriodStartToday) {
-    countdownText = '🩸 Hôm nay là ngày bắt đầu đến tháng!';
-    statusBadgeText = '🩸 Hôm nay đến tháng';
+    countdownText = '🌸 Hôm nay là ngày của nàng!';
+    statusBadgeText = '🌸 Hôm nay';
   } else if (daysUntilNextPeriod === 1) {
-    countdownText = 'Còn 1 ngày nữa đến ngày đến tháng (Ngày mai)';
-    statusBadgeText = '⚠️ Còn 1 ngày';
+    countdownText = 'Còn 1 ngày nữa đến ngày của nàng (Ngày mai)';
+    statusBadgeText = '🌸 Còn 1 ngày';
   } else if (daysUntilNextPeriod <= 3) {
-    countdownText = `Còn ${daysUntilNextPeriod} ngày nữa đến ngày đến tháng (Sắp tới)`;
-    statusBadgeText = `⚠️ Còn ${daysUntilNextPeriod} ngày`;
+    countdownText = `Còn ${daysUntilNextPeriod} ngày nữa đến ngày của nàng (Sắp tới)`;
+    statusBadgeText = `🌸 Còn ${daysUntilNextPeriod} ngày`;
   } else {
-    countdownText = `Còn ${daysUntilNextPeriod} ngày nữa đến ngày đến tháng`;
-    statusBadgeText = `🩸 Còn ${daysUntilNextPeriod} ngày`;
+    countdownText = `Còn ${daysUntilNextPeriod} ngày nữa đến ngày của nàng`;
+    statusBadgeText = `🌸 Còn ${daysUntilNextPeriod} ngày`;
   }
 
   return {
@@ -118,7 +118,7 @@ export interface DayCycleMarker {
 }
 
 /**
- * Lấy đánh dấu ngày bắt đầu đến tháng (dùng cho Calendar)
+ * Lấy đánh dấu ngày của nàng (dùng cho Calendar)
  * Chỉ hiển thị đúng ngày bắt đầu của chu kỳ, không hiển thị các ngày phụ hay rụng trứng.
  */
 export function getCycleDayMarker(
@@ -138,7 +138,7 @@ export function getCycleDayMarker(
   if (normalizedIndex === 0) {
     return {
       type: 'period',
-      label: 'Ngày bắt đầu đến tháng 🩸',
+      label: 'Ngày của nàng 🌸',
     };
   }
 

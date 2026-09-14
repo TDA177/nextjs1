@@ -133,7 +133,7 @@ export default function CoupleCalendar({
             <h2 className="text-2xl font-black text-white capitalize">
               {format(currentMonth, 'MMMM yyyy', { locale: vi })}
             </h2>
-            <p className="text-xs text-slate-400">Lịch đôi - Sự kiện, Bucket & Chu kỳ nàng (Rule 2)</p>
+            <p className="text-xs text-slate-400">Lịch đôi - Sự kiện, Kế hoạch & Ngày của nàng</p>
           </div>
         </div>
 
@@ -148,10 +148,10 @@ export default function CoupleCalendar({
                   ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 hover:bg-rose-500/30'
                   : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-slate-200'
               }`}
-              title="Bật/Tắt hiển thị chu kỳ kinh nguyệt trên lịch"
+              title="Bật/Tắt hiển thị ngày của nàng trên lịch"
             >
               {showPeriodOverlay ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-              <span>Chu kỳ nàng 🩸</span>
+              <span>Ngày của nàng 🌸</span>
             </button>
           ) : (
             onOpenPeriodTracker && (
@@ -160,7 +160,7 @@ export default function CoupleCalendar({
                 onClick={onOpenPeriodTracker}
                 className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-semibold border border-rose-500/30 flex items-center gap-1"
               >
-                <span>➕ Cài đặt chu kỳ 🩸</span>
+                <span>➕ Cài đặt ngày của nàng 🌸</span>
               </button>
             )
           )}
@@ -254,7 +254,7 @@ export default function CoupleCalendar({
                         className="text-[11px] px-1.5 py-0.5 rounded-md bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold"
                         title={cycleMarker?.label}
                       >
-                        🩸 Đến tháng
+                        🌸 Ngày của nàng
                       </span>
                     )}
 
@@ -308,7 +308,7 @@ export default function CoupleCalendar({
                   <CalendarIcon className="w-5 h-5 text-rose-400" />
                   {format(selectedDay, 'dd MMMM yyyy', { locale: vi })}
                 </h3>
-                <p className="text-xs text-slate-400">Danh sách tất cả kế hoạch & chu kỳ trong ngày này</p>
+                <p className="text-xs text-slate-400">Danh sách tất cả kế hoạch trong ngày này</p>
               </div>
               <button
                 onClick={() => setSelectedDay(null)}
@@ -323,10 +323,10 @@ export default function CoupleCalendar({
               <div className="p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/50 to-pink-950/40 border border-rose-500/40 text-xs flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="font-bold text-rose-300 flex items-center gap-1.5">
-                    🩸 Ngày Bắt Đầu Đến Tháng
+                    🌸 Ngày Đặc Biệt Của {periodSetting?.partnerName || 'Nàng'}
                   </div>
                   <div className="text-slate-200 text-[11px]">
-                    Ngày bắt đầu chu kỳ của {periodSetting?.partnerName || 'Em'}. Nhớ mua đồ ngọt và pha trà ấm nhé! ❤️
+                    Ngày đặc biệt của {periodSetting?.partnerName || 'Em'}. Nhớ mua đồ ngọt và pha trà ấm nhé! ❤️
                   </div>
                 </div>
                 {onOpenPeriodTracker && (
@@ -338,7 +338,7 @@ export default function CoupleCalendar({
                     }}
                     className="px-3 py-1.5 rounded-xl bg-rose-500 text-white text-[11px] font-bold hover:bg-rose-600 transition-colors shadow-sm flex-shrink-0"
                   >
-                    Xem chu kỳ
+                    Xem chi tiết
                   </button>
                 )}
               </div>

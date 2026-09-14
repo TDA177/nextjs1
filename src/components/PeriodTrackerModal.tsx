@@ -62,7 +62,7 @@ export default function PeriodTrackerModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!startDate) {
-      setError('Vui lòng chọn ngày bắt đầu đến tháng');
+      setError('Vui lòng chọn ngày bắt đầu');
       return;
     }
 
@@ -101,7 +101,7 @@ export default function PeriodTrackerModal({
   };
 
   const handleDelete = async () => {
-    if (!confirm('Bạn có chắc chắn muốn xóa theo dõi ngày đến tháng này không?')) return;
+    if (!confirm('Bạn có chắc chắn muốn xóa theo dõi ngày của nàng không?')) return;
     try {
       setLoading(true);
       const res = await fetch('/api/period', { method: 'DELETE' });
@@ -132,7 +132,7 @@ export default function PeriodTrackerModal({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-xl font-black text-white">
-                  Theo Dõi Ngày Đến Tháng Của {partnerName || 'Em'} 🌸
+                  Góc Của {partnerName || 'Em'} 🌸
                 </h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
                   Chu kỳ {cycleLength} ngày
@@ -251,8 +251,8 @@ export default function PeriodTrackerModal({
 
                 {/* Next Date Display Card */}
                 <div className="bg-slate-900/80 p-4 rounded-2xl border border-slate-700/60 text-center min-w-[180px]">
-                  <div className="text-3xl mb-1">🩸</div>
-                  <div className="text-xs font-bold text-slate-200">Ngày Đến Tháng Kế Tiếp</div>
+                  <div className="text-3xl mb-1">🌸</div>
+                  <div className="text-xs font-bold text-slate-200">Ngày Của Nàng Kế Tiếp</div>
                   <div className="text-base font-black text-rose-400 mt-1">
                     {format(previewCycleInfo.nextPeriodStartDate, 'dd/MM/yyyy')}
                   </div>
@@ -268,7 +268,7 @@ export default function PeriodTrackerModal({
               <div className="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 flex items-center justify-between">
                 <div>
                   <div className="text-slate-400 flex items-center gap-1.5 mb-1">
-                    <span>🩸</span> Ngày bắt đầu kỳ gần nhất
+                    <span>🌸</span> Ngày gần nhất
                   </div>
                   <div className="font-bold text-white text-base">
                     {format(new Date(previewCycleInfo.currentCycleStartDate), 'dd/MM/yyyy')}
@@ -372,13 +372,13 @@ export default function PeriodTrackerModal({
           <form onSubmit={handleSubmit} className="space-y-4 text-xs">
             <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-slate-300 text-xs leading-relaxed space-y-1">
               <div className="font-bold text-rose-300 flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4" /> Cách thức hoạt động của chu kỳ 28 ngày:
+                <Sparkles className="w-4 h-4" /> Cách thức hoạt động:
               </div>
               <p>
-                • Bạn chỉ cần chọn <strong>ngày bắt đầu bị gần nhất</strong> (ví dụ: ngày 10).
+                • Bạn chỉ cần chọn <strong>ngày bắt đầu gần nhất</strong> (ví dụ: ngày 10).
               </p>
               <p>
-                • Hệ thống sẽ tự động tính ngày bắt đầu kế tiếp sau <strong>28 ngày</strong> (lặp lại liên tục cho tất cả các tháng) và hiển thị thông báo đếm ngược chính xác cùng dấu 🩸 trên Lịch Đôi.
+                • Hệ thống sẽ tự động tính ngày bắt đầu kế tiếp sau <strong>{cycleLength || 28} ngày</strong> (lặp lại liên tục cho tất cả các tháng) và hiển thị thông báo đếm ngược tinh tế cùng dấu 🌸 trên Lịch Đôi.
               </p>
             </div>
 
@@ -386,7 +386,7 @@ export default function PeriodTrackerModal({
               {/* Start Date */}
               <div>
                 <label className="block text-slate-300 font-semibold mb-1.5">
-                  Ngày bắt đầu đến tháng gần nhất *
+                  Ngày bắt đầu gần nhất *
                 </label>
                 <input
                   type="date"
@@ -474,7 +474,7 @@ export default function PeriodTrackerModal({
             {previewCycleInfo && (
               <div className="p-3.5 rounded-2xl bg-slate-800/80 border border-slate-700 text-slate-300 flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-rose-400">Dự báo ngày đến tháng</div>
+                  <div className="text-[10px] uppercase font-bold text-rose-400">Dự báo ngày của nàng</div>
                   <div className="font-bold text-white text-sm mt-0.5">
                     {previewCycleInfo.countdownText}
                   </div>
@@ -482,7 +482,7 @@ export default function PeriodTrackerModal({
                     Kỳ tiếp theo: {format(previewCycleInfo.nextPeriodStartDate, 'dd/MM/yyyy')} (Lặp lại {cycleLength} ngày)
                   </div>
                 </div>
-                <div className="text-2xl">🩸</div>
+                <div className="text-2xl">🌸</div>
               </div>
             )}
 
@@ -514,7 +514,7 @@ export default function PeriodTrackerModal({
                   disabled={loading}
                   className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white font-bold hover:from-rose-600 hover:to-purple-700 shadow-lg shadow-rose-500/25 transition-all"
                 >
-                  {loading ? 'Đang lưu...' : 'Lưu Ngày Đến Tháng ❤️'}
+                  {loading ? 'Đang lưu...' : 'Lưu Cài Đặt ❤️'}
                 </button>
               </div>
             </div>

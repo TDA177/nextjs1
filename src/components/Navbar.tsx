@@ -100,10 +100,10 @@ export default function Navbar({
             <button
               onClick={onOpenPeriodTracker}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-rose-300 border border-pink-500/30 text-xs font-semibold transition-all transform hover:scale-105"
-              title="Theo dõi chu kỳ nàng (Đếm ngược 28 ngày & Bí kíp chăm sóc)"
+              title="Góc chăm sóc nàng (Đếm ngược & Nhắc nhở yêu thương)"
             >
-              <span>🩸</span>
-              <span className="hidden sm:inline">Chu Kỳ Nàng</span>
+              <span>🌸</span>
+              <span className="hidden sm:inline">Ngày Của Nàng</span>
               {periodCycleInfo && (
                 <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/30 text-rose-200 font-mono">
                   {periodCycleInfo.statusBadgeText}
@@ -228,8 +228,8 @@ export default function Navbar({
             onClick={onOpenPeriodTracker}
             className="flex flex-col items-center gap-1 py-1 text-pink-400 font-bold"
           >
-            <span>🩸</span>
-            Chu Kỳ
+            <span>🌸</span>
+            Ngày Của Nàng
           </button>
         )}
       </div>
