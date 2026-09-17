@@ -117,3 +117,24 @@ model PeriodLog {
   createdAt       DateTime      @default(now())
 }
 
+model CoupleProfile {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId       String   @unique @default("couple-1")
+  startDate      DateTime @default(now())
+  partner1Name   String   @default("Anh")
+  partner1Avatar String?
+  partner2Name   String   @default("Em")
+  partner2Avatar String?
+  loveQuote      String?  @default("Cùng nhau già đi là điều lãng mạn nhất thế gian ❤️")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model RouletteCustomItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId  String   @default("couple-1")
+  category  String   // "food" | "activity"
+  title     String
+  createdAt DateTime @default(now())
+}
+

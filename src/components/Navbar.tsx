@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Users } from 'lucide-react';
+import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Users, Compass } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'calendar' | 'dashboard' | 'buckets';
@@ -14,6 +14,9 @@ interface NavbarProps {
   onMarkNotificationRead: (id: string) => void;
   onOpenPeriodTracker?: () => void;
   periodCycleInfo?: any | null;
+  onOpenLoveModal?: () => void;
+  onOpenRouletteModal?: () => void;
+  loveDaysCount?: number;
 }
 
 export const USERS = [
@@ -32,6 +35,9 @@ export default function Navbar({
   onMarkNotificationRead,
   onOpenPeriodTracker,
   periodCycleInfo,
+  onOpenLoveModal,
+  onOpenRouletteModal,
+  loveDaysCount,
 }: NavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -95,6 +101,32 @@ export default function Navbar({
 
         {/* Actions & User Switcher */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Love Days Quick Badge */}
+          {onOpenLoveModal && (
+            <button
+              onClick={onOpenLoveModal}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              title="Đếm ngày yêu nhau & Các mốc kỷ niệm"
+            >
+              <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400 animate-pulse" />
+              <span className="font-bold">
+                {loveDaysCount ? `${loveDaysCount} Ngày` : 'Đếm Ngày Yêu'}
+              </span>
+            </button>
+          )}
+
+          {/* Date Roulette Button */}
+          {onOpenRouletteModal && (
+            <button
+              onClick={onOpenRouletteModal}
+              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              title="Vòng quay: Hôm nay ăn gì, đi đâu?"
+            >
+              <Compass className="w-3.5 h-3.5 text-purple-400 animate-spin" style={{ animationDuration: '8s' }} />
+              <span>Vòng Quay</span>
+            </button>
+          )}
+
           {/* Period Tracker Button */}
           {onOpenPeriodTracker && (
             <button
@@ -223,13 +255,22 @@ export default function Navbar({
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
         </button>
+        {onOpenRouletteModal && (
+          <button
+            onClick={onOpenRouletteModal}
+            className="flex flex-col items-center gap-1 py-1 text-purple-400 font-bold"
+          >
+            <Compass className="w-4 h-4" />
+            Vòng Quay
+          </button>
+        )}
         {onOpenPeriodTracker && (
           <button
             onClick={onOpenPeriodTracker}
             className="flex flex-col items-center gap-1 py-1 text-pink-400 font-bold"
           >
             <span>🌸</span>
-            Ngày Của Nàng
+            Ngày Nàng
           </button>
         )}
       </div>

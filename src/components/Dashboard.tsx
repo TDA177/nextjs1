@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Clock, AlertTriangle, ListTodo, Flame, Calendar, Award, Sparkles, Heart, Timer } from 'lucide-react';
+import LoveCounterCard from './LoveCounterCard';
 
 interface DashboardProps {
   items: any[];
@@ -9,6 +10,9 @@ interface DashboardProps {
   periodSetting?: any | null;
   periodCycleInfo?: any | null;
   onOpenPeriodTracker?: () => void;
+  profile?: any | null;
+  onOpenLoveModal?: () => void;
+  onOpenRouletteModal?: () => void;
 }
 
 const getCountdownDays = (dateStr: string | null, type: string) => {
@@ -44,6 +48,9 @@ export default function Dashboard({
   periodSetting,
   periodCycleInfo,
   onOpenPeriodTracker,
+  profile,
+  onOpenLoveModal,
+  onOpenRouletteModal,
 }: DashboardProps) {
   const buckets = items.filter((i) => i.type === 'Bucket');
   const events = items.filter((i) => i.type === 'Event');
@@ -72,7 +79,14 @@ export default function Dashboard({
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      {/* Hero Welcome Card */}
+      {/* Love Days Counter Hero Card */}
+      <LoveCounterCard
+        profile={profile}
+        onOpenLoveModal={onOpenLoveModal || (() => {})}
+        onOpenRouletteModal={onOpenRouletteModal || (() => {})}
+      />
+
+      {/* Hero Welcome & Overall Progress Card */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-rose-500/20 via-purple-500/20 to-pink-500/10 border border-rose-500/30 p-8 glass-card">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>

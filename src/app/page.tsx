@@ -8,6 +8,9 @@ import BucketList from '@/components/BucketList';
 import BucketDetailModal from '@/components/BucketDetailModal';
 import CreateItemModal from '@/components/CreateItemModal';
 import PeriodTrackerModal from '@/components/PeriodTrackerModal';
+import LoveCounterModal from '@/components/LoveCounterModal';
+import DateRouletteModal from '@/components/DateRouletteModal';
+import { calculateLoveStats } from '@/lib/loveUtils';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets'>('calendar');
@@ -16,6 +19,11 @@ export default function Home() {
   const [items, setItems] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Couple Profile (Love days, avatars, names)
+  const [profile, setProfile] = useState<any | null>(null);
+  const [showLoveModal, setShowLoveModal] = useState(false);
+  const [showRouletteModal, setShowRouletteModal] = useState(false);
 
   // Period Tracker states
   const [periodSetting, setPeriodSetting] = useState<any | null>(null);
@@ -26,6 +34,8 @@ export default function Home() {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createInitialDate, setCreateInitialDate] = useState<Date | null>(null);
+  const [createInitialTitle, setCreateInitialTitle] = useState('');
+  const [createInitialType, setCreateInitialType] = useState('Bucket');
 
   // Fetch all planner items
   const fetchItems = async () => {
@@ -78,9 +88,23 @@ export default function Home() {
     }
   };
 
+  // Fetch couple profile
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch('/api/profile?coupleId=couple-1');
+      if (res.ok) {
+        const data = await res.json();
+        setProfile(data);
+      }
+    } catch (e) {
+      console.error('Error fetching couple profile:', e);
+    }
+  };
+
   useEffect(() => {
     fetchItems();
     fetchPeriod();
+    fetchProfile();
   }, []);
 
   useEffect(() => {
@@ -101,6 +125,7 @@ export default function Home() {
   };
 
   const unreadNotificationsCount = notifications.filter((n) => !n.isRead).length;
+  const loveDaysCount = profile?.startDate ? calculateLoveStats(profile.startDate).totalDays : undefined;
 
   return (
     <div className="min-h-screen pb-16">
@@ -112,9 +137,14 @@ export default function Home() {
         setCurrentUser={setCurrentUser}
         onOpenCreate={() => {
           setCreateInitialDate(null);
+          setCreateInitialTitle('');
+          setCreateInitialType('Bucket');
           setShowCreateModal(true);
         }}
         onOpenPeriodTracker={() => setShowPeriodModal(true)}
+        onOpenLoveModal={() => setShowLoveModal(true)}
+        onOpenRouletteModal={() => setShowRouletteModal(true)}
+        loveDaysCount={loveDaysCount}
         periodCycleInfo={periodCycleInfo}
         notificationsCount={unreadNotificationsCount}
         notifications={notifications}
@@ -136,6 +166,8 @@ export default function Home() {
                 onSelectItem={(item) => setSelectedItem(item)}
                 onOpenCreateDate={(date) => {
                   setCreateInitialDate(date);
+                  setCreateInitialTitle('');
+                  setCreateInitialType('Event');
                   setShowCreateModal(true);
                 }}
                 periodSetting={periodSetting}
@@ -150,6 +182,8 @@ export default function Home() {
                 onSelectItem={(item) => setSelectedItem(item)}
                 onOpenCreate={() => {
                   setCreateInitialDate(null);
+                  setCreateInitialTitle('');
+                  setCreateInitialType('Bucket');
                   setShowCreateModal(true);
                 }}
               />
@@ -162,6 +196,9 @@ export default function Home() {
                 periodSetting={periodSetting}
                 periodCycleInfo={periodCycleInfo}
                 onOpenPeriodTracker={() => setShowPeriodModal(true)}
+                profile={profile}
+                onOpenLoveModal={() => setShowLoveModal(true)}
+                onOpenRouletteModal={() => setShowRouletteModal(true)}
               />
             )}
           </>
@@ -182,8 +219,14 @@ export default function Home() {
       {showCreateModal && (
         <CreateItemModal
           initialDate={createInitialDate}
+          initialTitle={createInitialTitle}
+          initialType={createInitialType}
           currentUser={currentUser}
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => {
+            setShowCreateModal(false);
+            setCreateInitialTitle('');
+            setCreateInitialType('Bucket');
+          }}
           onRefresh={fetchItems}
         />
       )}
@@ -195,6 +238,29 @@ export default function Home() {
           onClose={() => setShowPeriodModal(false)}
           onRefresh={() => {
             fetchPeriod();
+          }}
+        />
+      )}
+
+      {/* Love Counter Modal */}
+      {showLoveModal && (
+        <LoveCounterModal
+          profile={profile}
+          onClose={() => setShowLoveModal(false)}
+          onRefresh={fetchProfile}
+        />
+      )}
+
+      {/* Date Decision Roulette Modal */}
+      {showRouletteModal && (
+        <DateRouletteModal
+          bucketItems={items}
+          onClose={() => setShowRouletteModal(false)}
+          onScheduleEvent={(title, category) => {
+            setCreateInitialTitle(category === 'food' ? `Ăn uống: ${title}` : `Hẹn hò: ${title}`);
+            setCreateInitialType('Event');
+            setCreateInitialDate(new Date());
+            setShowCreateModal(true);
           }}
         />
       )}

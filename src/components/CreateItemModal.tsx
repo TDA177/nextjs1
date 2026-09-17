@@ -5,15 +5,24 @@ import { X, Plus, Calendar, Sparkles, Heart, Tag, User } from 'lucide-react';
 
 interface CreateItemModalProps {
   initialDate?: Date | null;
+  initialTitle?: string;
+  initialType?: string;
   currentUser: { id: string; name: string; avatar: string };
   onClose: () => void;
   onRefresh: () => void;
 }
 
-export default function CreateItemModal({ initialDate, currentUser, onClose, onRefresh }: CreateItemModalProps) {
-  const [title, setTitle] = useState('');
+export default function CreateItemModal({
+  initialDate,
+  initialTitle = '',
+  initialType = 'Bucket',
+  currentUser,
+  onClose,
+  onRefresh,
+}: CreateItemModalProps) {
+  const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState('');
-  const [type, setType] = useState('Bucket');
+  const [type, setType] = useState(initialType);
   const [priority, setPriority] = useState('High');
   const [deadline, setDeadline] = useState(
     initialDate ? initialDate.toISOString().split('T')[0] : ''
