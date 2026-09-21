@@ -11,7 +11,7 @@ import PeriodTrackerModal from '@/components/PeriodTrackerModal';
 import LoveCounterModal from '@/components/LoveCounterModal';
 import DateRouletteModal from '@/components/DateRouletteModal';
 import AIChatModal from '@/components/AIChatModal';
-import { Mascot } from 'page-mascot';
+import AnimatedMascot from '@/components/AnimatedMascot';
 import { calculateLoveStats } from '@/lib/loveUtils';
 import { Sparkles } from 'lucide-react';
 
@@ -276,11 +276,13 @@ export default function Home() {
         title="Hỏi trợ lý Haha về ngày lễ, lịch hẹn"
       >
         <div className="relative w-10 h-10 flex items-center justify-center -my-1">
-          <Mascot
+          <AnimatedMascot
             directions="/mascots/redpanda-directions.webp"
             reactions="/mascots/redpanda-reactions.webp"
             size={40}
             className="pointer-events-none"
+            shakeIntervalMs={60000}
+            autoIdle={true}
           />
           <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200 absolute -top-1 -right-1 animate-pulse pointer-events-none" />
         </div>
