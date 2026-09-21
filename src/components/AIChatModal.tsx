@@ -5,7 +5,6 @@ import {
   X,
   Send,
   Sparkles,
-  Bot,
   User,
   Key,
   Calendar,
@@ -15,6 +14,7 @@ import {
   ExternalLink,
   ChevronRight,
 } from 'lucide-react';
+import { Mascot } from 'page-mascot';
 
 interface ChatMessage {
   id: string;
@@ -159,8 +159,12 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
         <div className="flex items-center justify-between px-5 py-3.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-rose-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-pink-500 via-rose-400 to-amber-300 flex items-center justify-center shadow-md shadow-pink-500/20 text-white">
-                <Bot className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow-md overflow-hidden border border-rose-200/50">
+                <Mascot
+                  directions="/mascots/redpanda-directions.webp"
+                  reactions="/mascots/redpanda-reactions.webp"
+                  size={38}
+                />
               </div>
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse" />
             </div>
@@ -219,8 +223,12 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
                       {currentUser?.name ? currentUser.name.slice(0, 1) : <User className="w-4 h-4" />}
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white flex items-center justify-center shadow">
-                      <Bot className="w-4 h-4" />
+                    <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow overflow-hidden border border-rose-200/60">
+                      <Mascot
+                        directions="/mascots/redpanda-directions.webp"
+                        reactions="/mascots/redpanda-reactions.webp"
+                        size={30}
+                      />
                     </div>
                   )}
                 </div>
@@ -242,8 +250,12 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
           {/* Hiệu ứng đang gõ */}
           {isLoading && (
             <div className="flex gap-2.5 items-center">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-rose-400 text-white flex items-center justify-center shadow">
-                <Bot className="w-4 h-4" />
+              <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow overflow-hidden border border-rose-200/60">
+                <Mascot
+                  directions="/mascots/redpanda-directions.webp"
+                  reactions="/mascots/redpanda-reactions.webp"
+                  size={30}
+                />
               </div>
               <div className="bg-white dark:bg-slate-800 px-4 py-3 rounded-2xl rounded-tl-none border border-rose-100 dark:border-slate-700 shadow-sm flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-rose-400 animate-bounce" style={{ animationDelay: '0ms' }} />

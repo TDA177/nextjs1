@@ -11,8 +11,9 @@ import PeriodTrackerModal from '@/components/PeriodTrackerModal';
 import LoveCounterModal from '@/components/LoveCounterModal';
 import DateRouletteModal from '@/components/DateRouletteModal';
 import AIChatModal from '@/components/AIChatModal';
+import { Mascot } from 'page-mascot';
 import { calculateLoveStats } from '@/lib/loveUtils';
-import { Bot, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets'>('calendar');
@@ -268,15 +269,20 @@ export default function Home() {
         />
       )}
 
-      {/* Floating AI Chat Assistant Button */}
+      {/* Floating AI Chat Assistant Button with Redpanda Mascot */}
       <button
         onClick={() => setShowAIChatModal(true)}
-        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 pl-2.5 pr-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
         title="Hỏi trợ lý Haha về ngày lễ, lịch hẹn"
       >
-        <div className="relative">
-          <Bot className="w-5 h-5" />
-          <Sparkles className="w-3 h-3 text-amber-200 fill-amber-200 absolute -top-1 -right-1 animate-pulse" />
+        <div className="relative w-10 h-10 flex items-center justify-center -my-1">
+          <Mascot
+            directions="/mascots/redpanda-directions.webp"
+            reactions="/mascots/redpanda-reactions.webp"
+            size={40}
+            className="pointer-events-none"
+          />
+          <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200 absolute -top-1 -right-1 animate-pulse pointer-events-none" />
         </div>
         <span className="hidden sm:inline text-sm font-semibold tracking-wide">
           Hỏi Haha AI
