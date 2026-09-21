@@ -10,7 +10,9 @@ import CreateItemModal from '@/components/CreateItemModal';
 import PeriodTrackerModal from '@/components/PeriodTrackerModal';
 import LoveCounterModal from '@/components/LoveCounterModal';
 import DateRouletteModal from '@/components/DateRouletteModal';
+import AIChatModal from '@/components/AIChatModal';
 import { calculateLoveStats } from '@/lib/loveUtils';
+import { Bot, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets'>('calendar');
@@ -24,6 +26,7 @@ export default function Home() {
   const [profile, setProfile] = useState<any | null>(null);
   const [showLoveModal, setShowLoveModal] = useState(false);
   const [showRouletteModal, setShowRouletteModal] = useState(false);
+  const [showAIChatModal, setShowAIChatModal] = useState(false);
 
   // Period Tracker states
   const [periodSetting, setPeriodSetting] = useState<any | null>(null);
@@ -264,6 +267,28 @@ export default function Home() {
           }}
         />
       )}
+
+      {/* Floating AI Chat Assistant Button */}
+      <button
+        onClick={() => setShowAIChatModal(true)}
+        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
+        title="Hỏi trợ lý Haha về ngày lễ, lịch hẹn"
+      >
+        <div className="relative">
+          <Bot className="w-5 h-5" />
+          <Sparkles className="w-3 h-3 text-amber-200 fill-amber-200 absolute -top-1 -right-1 animate-pulse" />
+        </div>
+        <span className="hidden sm:inline text-sm font-semibold tracking-wide">
+          Hỏi Haha AI
+        </span>
+      </button>
+
+      {/* Haha AI Chat Modal */}
+      <AIChatModal
+        isOpen={showAIChatModal}
+        onClose={() => setShowAIChatModal(false)}
+        currentUser={currentUser}
+      />
     </div>
   );
 }
