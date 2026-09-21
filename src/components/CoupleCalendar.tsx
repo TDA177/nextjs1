@@ -248,6 +248,21 @@ export default function CoupleCalendar({
                   </span>
 
                   <div className="flex items-center gap-1">
+                    {/* Quick Add Button on Hover */}
+                    {onOpenCreateDate && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onOpenCreateDate(day);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 p-1 hover:bg-rose-500 rounded-lg text-slate-300 hover:text-white transition-all text-xs flex items-center justify-center bg-slate-800/80 border border-slate-700/60 shadow-sm"
+                        title={`Thêm sự kiện cho ngày ${format(day, 'dd/MM/yyyy')}`}
+                      >
+                        <Plus className="w-3 h-3" />
+                      </button>
+                    )}
+
                     {/* Period Start Day Icon */}
                     {isPeriodStartDay && (
                       <span
@@ -307,15 +322,36 @@ export default function CoupleCalendar({
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                   <CalendarIcon className="w-5 h-5 text-rose-400" />
                   {format(selectedDay, 'dd MMMM yyyy', { locale: vi })}
+                  {daySelectedItems.length > 0 && (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-semibold">
+                      {daySelectedItems.length} sự kiện
+                    </span>
+                  )}
                 </h3>
                 <p className="text-xs text-slate-400">Danh sách tất cả kế hoạch trong ngày này</p>
               </div>
-              <button
-                onClick={() => setSelectedDay(null)}
-                className="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800"
-              >
-                ✕
-              </button>
+
+              <div className="flex items-center gap-2">
+                {onOpenCreateDate && (
+                  <button
+                    onClick={() => {
+                      const target = selectedDay;
+                      setSelectedDay(null);
+                      onOpenCreateDate(target);
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-md shadow-rose-500/20"
+                    title="Thêm sự kiện mới cho ngày này"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Thêm sự kiện
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedDay(null)}
+                  className="text-slate-400 hover:text-white p-2 rounded-xl bg-slate-800 hover:bg-slate-700 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
 
             {/* If Selected Day is a Period Start Day */}
@@ -362,34 +398,55 @@ export default function CoupleCalendar({
                   )}
                 </div>
               ) : (
-                daySelectedItems.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => {
-                      setSelectedDay(null);
-                      onSelectItem(item.originalItem || item);
-                    }}
-                    className="p-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 cursor-pointer transition-all flex items-center justify-between group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{getItemTypeIcon(item.type, item.calendarDisplayTitle)}</span>
-                      <div>
-                        <div className="font-semibold text-slate-100 text-sm group-hover:text-rose-300 transition-colors">
-                          {item.calendarDisplayTitle}
-                        </div>
-                        <div className="text-xs text-slate-400 flex items-center gap-2 mt-1">
-                          <span className="px-2 py-0.5 rounded bg-slate-700 text-rose-300 font-mono text-[10px]">
-                            {item.type}
-                          </span>
-                          <span>Trạng thái: {item.status}</span>
+                <>
+                  {daySelectedItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        setSelectedDay(null);
+                        onSelectItem(item.originalItem || item);
+                      }}
+                      className="p-4 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 cursor-pointer transition-all flex items-center justify-between group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{getItemTypeIcon(item.type, item.calendarDisplayTitle)}</span>
+                        <div>
+                          <div className="font-semibold text-slate-100 text-sm group-hover:text-rose-300 transition-colors">
+                            {item.calendarDisplayTitle}
+                          </div>
+                          <div className="text-xs text-slate-400 flex items-center gap-2 mt-1">
+                            <span className="px-2 py-0.5 rounded bg-slate-700 text-rose-300 font-mono text-[10px]">
+                              {item.type}
+                            </span>
+                            <span>Trạng thái: {item.status}</span>
+                            {item.deadline && (
+                              <span className="text-[10px] text-slate-400">
+                                • {new Date(item.deadline).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) !== '00:00' ? new Date(item.deadline).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : ''}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
+                      <span className="text-xs text-rose-400 font-semibold group-hover:translate-x-1 transition-transform">
+                        Xem chi tiết →
+                      </span>
                     </div>
-                    <span className="text-xs text-rose-400 font-semibold group-hover:translate-x-1 transition-transform">
-                      Xem chi tiết →
-                    </span>
-                  </div>
-                ))
+                  ))}
+
+                  {/* Nút thêm sự kiện mới luôn hiển thị kể cả khi đã có nhiều sự kiện */}
+                  {onOpenCreateDate && (
+                    <button
+                      onClick={() => {
+                        const target = selectedDay;
+                        setSelectedDay(null);
+                        onOpenCreateDate(target);
+                      }}
+                      className="w-full py-3 rounded-2xl border-2 border-dashed border-rose-500/40 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 hover:text-white text-xs font-bold transition-all flex items-center justify-center gap-2 mt-2 shadow-sm"
+                    >
+                      <Plus className="w-4 h-4" /> + Thêm sự kiện / kế hoạch khác cho ngày này ({daySelectedItems.length} sự kiện hiện có)
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Plus, Calendar, Sparkles, Heart, Tag, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Plus, Calendar, Sparkles, Heart, Tag, User, Clock, Check } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface CreateItemModalProps {
   initialDate?: Date | null;
@@ -15,7 +16,7 @@ interface CreateItemModalProps {
 export default function CreateItemModal({
   initialDate,
   initialTitle = '',
-  initialType = 'Bucket',
+  initialType = 'Event',
   currentUser,
   onClose,
   onRefresh,
@@ -23,16 +24,34 @@ export default function CreateItemModal({
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState('');
   const [type, setType] = useState(initialType);
-  const [priority, setPriority] = useState('High');
-  const [deadline, setDeadline] = useState(
-    initialDate ? initialDate.toISOString().split('T')[0] : ''
-  );
+  const [priority, setPriority] = useState('Medium');
+  const [eventTime, setEventTime] = useState('');
+  const [keepOpenAfterSave, setKeepOpenAfterSave] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+
+  const getInitialDateStr = (d?: Date | null) => {
+    if (!d) return '';
+    try {
+      return format(d, 'yyyy-MM-dd');
+    } catch {
+      return '';
+    }
+  };
+
+  const [deadline, setDeadline] = useState(getInitialDateStr(initialDate));
   const [color, setColor] = useState('Hồng');
   const [assignedTo, setAssignedTo] = useState('Both');
   const [checklists, setChecklists] = useState<string[]>([]);
   const [checklistInput, setChecklistInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialDate) {
+      setDeadline(getInitialDateStr(initialDate));
+    }
+  }, [initialDate]);
 
   const handleAddChecklistItem = () => {
     if (!checklistInput.trim()) return;
@@ -47,22 +66,40 @@ export default function CreateItemModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError('Vui lòng nhập tên mục kế hoạch');
+      setError('Vui lòng nhập tên sự kiện / kế hoạch');
       return;
     }
 
     try {
       setLoading(true);
       setError(null);
+      setSuccessNotice(null);
+
+      // Nếu có nhập giờ cụ thể, kết hợp với ngày deadline
+      let finalDeadline: string | null = null;
+      let finalStartDate: string | null = null;
+
+      if (deadline) {
+        if (eventTime) {
+          const dateTimeStr = `${deadline}T${eventTime}:00`;
+          finalDeadline = new Date(dateTimeStr).toISOString();
+          finalStartDate = finalDeadline;
+        } else {
+          finalDeadline = new Date(`${deadline}T00:00:00`).toISOString();
+          finalStartDate = finalDeadline;
+        }
+      }
+
       const res = await fetch('/api/planner', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim(),
           type,
           priority,
-          deadline: deadline ? deadline : null,
+          startDate: finalStartDate,
+          deadline: finalDeadline,
           color,
           createdBy: currentUser.name,
           assignedTo,
@@ -77,7 +114,18 @@ export default function CreateItemModal({
       }
 
       onRefresh();
-      onClose();
+
+      if (keepOpenAfterSave) {
+        setSavedCount((prev) => prev + 1);
+        setSuccessNotice(`Đã thêm thành công "${title}"! Bạn có thể nhập tiếp sự kiện tiếp theo cho ngày này.`);
+        setTitle('');
+        setDescription('');
+        setEventTime('');
+        setChecklists([]);
+        setTimeout(() => setSuccessNotice(null), 3000);
+      } else {
+        onClose();
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -109,13 +157,20 @@ export default function CreateItemModal({
           </div>
         )}
 
+        {successNotice && (
+          <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs font-semibold flex items-center gap-2 animate-fadeIn">
+            <Check className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+            <span>{successNotice}</span>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           {/* Title */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1.5">Tên kế hoạch *</label>
+            <label className="block text-slate-300 font-semibold mb-1.5">Tên sự kiện / kế hoạch *</label>
             <input
               type="text"
-              placeholder="Ví dụ: Đi Nhật Bản, Chụp ảnh cưới, Đi xem phim..."
+              placeholder="Ví dụ: Đi ăn tối, Xem phim rạp, Đi dạo phố, Chụp ảnh..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-rose-500"
@@ -132,8 +187,8 @@ export default function CreateItemModal({
                 onChange={(e) => setType(e.target.value)}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:border-rose-500"
               >
-                <option value="Bucket">Bucket (Điều muốn làm trong tương lai)</option>
                 <option value="Event">Event (Sự kiện diễn ra tại mốc thời gian)</option>
+                <option value="Bucket">Bucket (Điều muốn làm trong tương lai)</option>
                 <option value="Task">Task (Việc cần hoàn thành)</option>
                 <option value="Anniversary">Anniversary (Ngày kỷ niệm ❤️)</option>
                 <option value="Birthday">Birthday (Sinh nhật 🎂)</option>
@@ -158,31 +213,48 @@ export default function CreateItemModal({
 
           {/* Description */}
           <div>
-            <label className="block text-slate-300 font-semibold mb-1.5">Mô tả</label>
+            <label className="block text-slate-300 font-semibold mb-1.5">Mô tả chi tiết (Không bắt buộc)</label>
             <textarea
               rows={2}
-              placeholder="Du lịch 3 ngày 2 đêm, ghé qua các địa điểm yêu thích..."
+              placeholder="Ghi chú thêm thông tin, địa điểm, chuẩn bị trang phục..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-slate-100 placeholder-slate-400 focus:outline-none focus:border-rose-500"
             />
           </div>
 
-          {/* Deadline (Rule 1 & Rule 2) */}
+          {/* Date & Time */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1.5">Deadline / Ngày diễn ra (Không bắt buộc)</label>
+              <label className="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-rose-400" />
+                Ngày diễn ra *
+              </label>
               <input
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:border-rose-500"
+                required
               />
-              <span className="text-[10px] text-slate-400 mt-1 block">
-                Rule 1 & 2: Không bắt buộc có ngày. Nếu chọn ngày sẽ tự động xuất hiện trên Lịch Đôi.
-              </span>
             </div>
 
+            <div>
+              <label className="block text-slate-300 font-semibold mb-1.5 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-purple-400" />
+                Giờ diễn ra (Không bắt buộc)
+              </label>
+              <input
+                type="time"
+                value={eventTime}
+                onChange={(e) => setEventTime(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-slate-100 focus:outline-none focus:border-rose-500"
+              />
+            </div>
+          </div>
+
+          {/* Color & Multiple Events Option */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-slate-300 font-semibold mb-1.5">Màu hiển thị trên Calendar</label>
               <select
@@ -196,6 +268,20 @@ export default function CreateItemModal({
                 <option value="Đỏ">Màu Đỏ ❤️‍🔥</option>
                 <option value="Tím">Màu Tím 💜</option>
               </select>
+            </div>
+
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-300 bg-slate-800/80 p-2.5 rounded-xl border border-slate-700/80 hover:border-rose-500/40 w-full transition-all">
+                <input
+                  type="checkbox"
+                  checked={keepOpenAfterSave}
+                  onChange={(e) => setKeepOpenAfterSave(e.target.checked)}
+                  className="w-4 h-4 rounded text-rose-500 focus:ring-0 accent-rose-500"
+                />
+                <span className="font-medium text-[11px] leading-tight text-rose-200">
+                  ⚡ Tiếp tục thêm sự kiện khác cho ngày này sau khi lưu
+                </span>
+              </label>
             </div>
           </div>
 
