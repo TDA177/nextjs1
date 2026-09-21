@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Users, Compass } from 'lucide-react';
+import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Compass } from 'lucide-react';
 
 interface NavbarProps {
   activeTab: 'calendar' | 'dashboard' | 'buckets';
@@ -41,8 +41,6 @@ export default function Navbar({
 }: NavbarProps) {
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const partner = USERS.find((u) => u.id !== currentUser.id) || USERS[1];
-
   return (
     <header className="sticky top-0 z-40 glass-card border-b border-rose-500/20 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -58,7 +56,6 @@ export default function Navbar({
                 Together ❤️
               </span>
             </h1>
-            <p className="text-xs text-slate-400">Anh ❤️ Em's Shared Journey</p>
           </div>
         </div>
 
@@ -209,26 +206,7 @@ export default function Navbar({
             )}
           </div>
 
-          {/* User Switcher Dropdown (Rule 8) */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-700/60">
-            <button
-              onClick={() => setCurrentUser(partner)}
-              title={`Bấm để chuyển tài khoản sang: ${partner.name}`}
-              className="flex items-center gap-2 p-1.5 pr-3 bg-slate-800/80 hover:bg-slate-700 rounded-xl border border-slate-700/80 transition-all text-xs"
-            >
-              <img
-                src={currentUser.avatar}
-                alt={currentUser.name}
-                className="w-7 h-7 rounded-full object-cover ring-2 ring-rose-400"
-              />
-              <div className="text-left hidden lg:block">
-                <div className="font-semibold text-slate-200">{currentUser.name}</div>
-                <div className="text-[10px] text-rose-400 flex items-center gap-1">
-                  <Users className="w-2.5 h-2.5" /> Chuyển sang {partner.name}
-                </div>
-              </div>
-            </button>
-          </div>
+
         </div>
       </div>
 
