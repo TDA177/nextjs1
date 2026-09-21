@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { prisma } from '@/lib/db';
-import { getUpcomingHolidays, formatFriendlyDate, calculateDaysUntil } from '@/lib/holidayUtils';
+import { getUpcomingHolidays, formatFriendlyDate, calculateDaysUntil, toVietnamStartOfDay } from '@/lib/holidayUtils';
 import { calculateLoveStats } from '@/lib/loveUtils';
 import { calculateCycleInfo } from '@/lib/periodUtils';
 import { startOfDay, addDays } from 'date-fns';
@@ -36,28 +36,35 @@ export async function POST(req: NextRequest) {
     // 2. Thu thập dữ liệu từ Database (Couple Profile, Events, Period)
     let coupleContext = '';
     try {
-      const [profile, upcomingItems, periodSetting] = await Promise.all([
+      const todayVN = toVietnamStartOfDay(now);
+      const [profile, rawUpcomingItems, periodSetting] = await Promise.all([
         prisma.coupleProfile.findFirst({ where: { coupleId: 'couple-1' } }),
         prisma.plannerItem.findMany({
           where: {
             coupleId: 'couple-1',
             status: { not: 'Cancelled' },
             startDate: {
-              gte: startOfDay(now),
-              lte: addDays(startOfDay(now), 45),
+              gte: addDays(todayVN, -1), // Lấy dôi ra 1 ngày đề phòng lệch UTC trên cloud database
+              lte: addDays(todayVN, 45),
             },
           },
           orderBy: { startDate: 'asc' },
-          take: 10,
+          take: 15,
         }),
         prisma.periodSetting.findFirst({ where: { coupleId: 'couple-1' } }),
       ]);
+
+      // Lọc các sự kiện diễn ra từ hôm nay trở đi theo lịch Việt Nam
+      const upcomingItems = (rawUpcomingItems || []).filter((item) => {
+        if (!item.startDate) return false;
+        return calculateDaysUntil(item.startDate, now) >= 0;
+      });
 
       // Context Tình yêu
       if (profile) {
         const stats = calculateLoveStats(profile.startDate);
         coupleContext += `\n- Tên cặp đôi: ${profile.partner1Name} và ${profile.partner2Name}`;
-        coupleContext += `\n- Ngày bắt đầu yêu: ${formatFriendlyDate(new Date(profile.startDate))}`;
+        coupleContext += `\n- Ngày bắt đầu yêu: ${formatFriendlyDate(profile.startDate)}`;
         coupleContext += `\n- Số ngày đã yêu nhau: ${stats.totalDays} ngày (${stats.years} năm ${stats.months} tháng ${stats.days} ngày)`;
         if (stats.nextMilestone) {
           coupleContext += `\n- Cột mốc tình yêu tiếp theo: ${stats.nextMilestone.label} (còn ${stats.nextMilestone.daysLeft} ngày nữa, vào ngày ${formatFriendlyDate(stats.nextMilestone.targetDate)})`;
@@ -68,8 +75,8 @@ export async function POST(req: NextRequest) {
       if (upcomingItems && upcomingItems.length > 0) {
         coupleContext += `\n- Các kế hoạch/lịch hẹn sắp tới của 2 bạn:`;
         for (const item of upcomingItems) {
-          const daysLeft = item.startDate ? calculateDaysUntil(item.startDate, now) : 0;
-          const dateStr = item.startDate ? formatFriendlyDate(new Date(item.startDate)) : 'Chưa định ngày';
+          const daysLeft = calculateDaysUntil(item.startDate!, now);
+          const dateStr = formatFriendlyDate(item.startDate!);
           coupleContext += `\n  + "${item.title}" [Loại: ${item.type}]: Diễn ra vào ${dateStr} (còn ${daysLeft} ngày nữa)`;
         }
       } else {

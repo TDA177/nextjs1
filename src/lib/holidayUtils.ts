@@ -111,7 +111,7 @@ export function getHolidaysForYear(year: number): HolidayItem[] {
  * Lấy các ngày lễ sắp tới tính từ ngày hiện tại
  */
 export function getUpcomingHolidays(fromDate: Date = new Date(), limit: number = 6): HolidayItem[] {
-  const today = startOfDay(fromDate);
+  const today = toVietnamStartOfDay(fromDate);
   const currentYear = today.getFullYear();
 
   // Lấy ngày lễ năm nay và năm kế tiếp (để cover các ngày đầu năm sau như Tết Dương/Tết Nguyên Đán)
@@ -122,11 +122,11 @@ export function getUpcomingHolidays(fromDate: Date = new Date(), limit: number =
 
   const upcoming = allHolidays
     .filter((h) => {
-      const hDate = startOfDay(h.date);
+      const hDate = toVietnamStartOfDay(h.date);
       return !isBefore(hDate, today);
     })
     .map((h) => {
-      const hDate = startOfDay(h.date);
+      const hDate = toVietnamStartOfDay(h.date);
       const daysRemaining = differenceInCalendarDays(hDate, today);
       return {
         ...h,
@@ -139,22 +139,64 @@ export function getUpcomingHolidays(fromDate: Date = new Date(), limit: number =
 }
 
 /**
- * Tính số ngày còn lại đến một sự kiện hoặc ngày lễ cụ thể
+ * Trích xuất ngày, tháng, năm theo múi giờ Việt Nam (UTC+7 / Asia/Ho_Chi_Minh)
+ */
+export function getVietnamDateParts(dateInput: Date | string | number) {
+  const d = new Date(dateInput);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(d);
+  const map: Record<string, string> = {};
+  for (const p of parts) {
+    if (p.type !== 'literal') map[p.type] = p.value;
+  }
+  return {
+    year: parseInt(map.year, 10),
+    month: parseInt(map.month, 10), // 1-12
+    day: parseInt(map.day, 10),
+    hour: parseInt(map.hour, 10),
+    minute: parseInt(map.minute, 10),
+    second: parseInt(map.second, 10),
+  };
+}
+
+/**
+ * Đưa bất kỳ thời điểm nào về 00:00:00 theo lịch ngày của Việt Nam
+ */
+export function toVietnamStartOfDay(dateInput: Date | string | number): Date {
+  const p = getVietnamDateParts(dateInput);
+  return new Date(p.year, p.month - 1, p.day, 0, 0, 0, 0);
+}
+
+/**
+ * Tính số ngày còn lại đến một sự kiện hoặc ngày lễ cụ thể (Chuẩn xác theo múi giờ Việt Nam)
  */
 export function calculateDaysUntil(targetDate: Date | string, fromDate: Date = new Date()): number {
-  const start = startOfDay(fromDate);
-  const target = startOfDay(new Date(targetDate));
+  const start = toVietnamStartOfDay(fromDate);
+  const target = toVietnamStartOfDay(targetDate);
   return differenceInCalendarDays(target, start);
 }
 
 /**
- * Định dạng ngày theo kiểu Việt Nam thân thiện
+ * Định dạng ngày theo kiểu Việt Nam thân thiện chuẩn xác theo múi giờ Asia/Ho_Chi_Minh
  */
-export function formatFriendlyDate(date: Date): string {
-  const daysOfWeek = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-  const dayName = daysOfWeek[date.getDay()];
-  const d = String(date.getDate()).padStart(2, '0');
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const y = date.getFullYear();
-  return `${dayName}, ngày ${d}/${m}/${y}`;
+export function formatFriendlyDate(dateInput: Date | string | number): string {
+  const d = new Date(dateInput);
+  const formatter = new Intl.DateTimeFormat('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    weekday: 'long',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  return formatter.format(d).replace(', ', ', ngày ');
 }
+
