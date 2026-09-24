@@ -170,7 +170,7 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
             </div>
             <div>
               <div className="flex items-center gap-1.5 font-bold text-slate-800 dark:text-white text-base">
-                Haha AI Assistant
+                Haha
                 <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
               </div>
               <p className="text-xs text-rose-500 dark:text-rose-400 font-medium">
