@@ -269,22 +269,21 @@ export default function Home() {
         />
       )}
 
-      {/* Floating AI Chat Assistant Button with Redpanda Mascot */}
+      {/* Floating AI Chat Assistant Button with Fox Mascot */}
       <button
         onClick={() => setShowAIChatModal(true)}
-        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 pl-2.5 pr-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 pl-2 pr-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
         title="Hỏi trợ lý Haha về ngày lễ, lịch hẹn"
       >
-        <div className="relative w-10 h-10 flex items-center justify-center -my-1">
+        <div className="relative w-11 h-11 flex items-center justify-center -my-1.5">
           <AnimatedMascot
-            directions="/mascots/redpanda-directions.webp"
-            reactions="/mascots/redpanda-reactions.webp"
-            size={40}
-            className="pointer-events-none"
-            shakeIntervalMs={60000}
+            image="/mascots/fox-mascot.webp"
+            size={42}
+            className="pointer-events-none drop-shadow"
+            shakeIntervalMs={45000}
             autoIdle={true}
           />
-          <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200 absolute -top-1 -right-1 animate-pulse pointer-events-none" />
+          <Sparkles className="w-3.5 h-3.5 text-amber-200 fill-amber-200 absolute -top-0.5 -right-0.5 animate-pulse pointer-events-none" />
         </div>
         <span className="hidden sm:inline text-sm font-semibold tracking-wide">
           Hỏi Haha AI

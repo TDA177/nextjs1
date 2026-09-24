@@ -161,9 +161,8 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
             <div className="relative">
               <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow-md overflow-hidden border border-rose-200/50">
                 <AnimatedMascot
-                  directions="/mascots/redpanda-directions.webp"
-                  reactions="/mascots/redpanda-reactions.webp"
-                  size={38}
+                  image="/mascots/fox-mascot-head.webp"
+                  size={36}
                   shakeIntervalMs={60000}
                 />
               </div>
@@ -226,8 +225,7 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow overflow-hidden border border-rose-200/60">
                       <AnimatedMascot
-                        directions="/mascots/redpanda-directions.webp"
-                        reactions="/mascots/redpanda-reactions.webp"
+                        image="/mascots/fox-mascot-head.webp"
                         size={30}
                         autoIdle={false}
                         shakeIntervalMs={0}
@@ -255,8 +253,7 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
             <div className="flex gap-2.5 items-center">
               <div className="w-8 h-8 rounded-full bg-amber-50 dark:bg-slate-800 flex items-center justify-center shadow overflow-hidden border border-rose-200/60">
                 <AnimatedMascot
-                  directions="/mascots/redpanda-directions.webp"
-                  reactions="/mascots/redpanda-reactions.webp"
+                  image="/mascots/fox-mascot-head.webp"
                   size={30}
                   autoIdle={true}
                   shakeIntervalMs={0}
