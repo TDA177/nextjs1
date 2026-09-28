@@ -173,9 +173,6 @@ export default function AIChatModal({ isOpen, onClose, currentUser }: AIChatModa
                 Haha
                 <Sparkles className="w-4 h-4 text-amber-500 fill-amber-500" />
               </div>
-              <p className="text-xs text-rose-500 dark:text-rose-400 font-medium">
-                Hỏi lịch, ngày lễ & chuyện cặp đôi
-              </p>
             </div>
           </div>
 
