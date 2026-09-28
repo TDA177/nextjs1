@@ -43,16 +43,16 @@ export default function Navbar({
 
   return (
     <header className="sticky top-0 z-40 glass-card border-b border-rose-500/20 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
         {/* Brand & Couple Badge */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-gradient-to-r from-rose-500 to-purple-600 p-2.5 rounded-2xl shadow-lg shadow-rose-500/20">
-            <Heart className="w-6 h-6 text-white animate-pulse fill-white" />
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 bg-gradient-to-r from-rose-500 to-purple-600 p-2 sm:p-2.5 rounded-2xl shadow-lg shadow-rose-500/20">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-pulse fill-white" />
           </div>
           <div>
-            <h1 className="text-xl font-bold bg-gradient-to-r from-rose-400 via-pink-300 to-purple-400 bg-clip-text text-transparent flex items-center gap-2">
+            <h1 className="text-base sm:text-lg font-bold bg-gradient-to-r from-rose-400 via-pink-300 to-purple-400 bg-clip-text text-transparent flex items-center gap-1.5 whitespace-nowrap">
               Couple Planner
-              <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
+              <span className="hidden xl:inline text-[11px] font-normal px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
                 Together ❤️
               </span>
             </h1>
@@ -60,65 +60,65 @@ export default function Navbar({
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-800/60 p-1.5 rounded-2xl border border-slate-700/50">
+        <nav className="hidden lg:flex items-center gap-1 bg-slate-800/60 p-1.5 rounded-2xl border border-slate-700/50 shrink-0">
           <button
             onClick={() => setActiveTab('calendar')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'calendar'
                 ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
             }`}
           >
-            <CalendarIcon className="w-4 h-4" />
-            Lịch Đôi (Calendar)
+            <CalendarIcon className="w-4 h-4 shrink-0" />
+            <span>Lịch Đôi</span>
           </button>
           <button
             onClick={() => setActiveTab('buckets')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'buckets'
                 ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
             }`}
           >
-            <Sparkles className="w-4 h-4" />
-            Danh Sách Bucket & Event
+            <Sparkles className="w-4 h-4 shrink-0" />
+            <span>Kế Hoạch</span>
           </button>
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'dashboard'
                 ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
             }`}
           >
-            <LayoutDashboard className="w-4 h-4" />
-            Dashboard
+            <LayoutDashboard className="w-4 h-4 shrink-0" />
+            <span>Dashboard</span>
           </button>
           <button
             onClick={() => setActiveTab('memories')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${
               activeTab === 'memories'
                 ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
             }`}
           >
-            <Camera className="w-4 h-4" />
-            Kỷ Niệm (Memories)
+            <Camera className="w-4 h-4 shrink-0" />
+            <span>Kỷ Niệm</span>
           </button>
         </nav>
 
         {/* Actions & User Switcher */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Love Days Quick Badge */}
           {onOpenLoveModal && (
             <button
               onClick={onOpenLoveModal}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 text-xs font-semibold transition-all transform hover:scale-105 whitespace-nowrap shrink-0"
               title="Đếm ngày yêu nhau & Các mốc kỷ niệm"
             >
-              <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400 animate-pulse" />
+              <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400 animate-pulse shrink-0" />
               <span className="font-bold">
-                {loveDaysCount ? `${loveDaysCount} Ngày` : 'Đếm Ngày Yêu'}
+                {loveDaysCount ? `${loveDaysCount} Ngày` : 'Đếm Ngày'}
               </span>
             </button>
           )}
@@ -127,10 +127,10 @@ export default function Navbar({
           {onOpenRouletteModal && (
             <button
               onClick={onOpenRouletteModal}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              className="hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-all transform hover:scale-105 whitespace-nowrap shrink-0"
               title="Vòng quay: Hôm nay ăn gì, đi đâu?"
             >
-              <Compass className="w-3.5 h-3.5 text-purple-400 animate-spin" style={{ animationDuration: '8s' }} />
+              <Compass className="w-3.5 h-3.5 text-purple-400 animate-spin shrink-0" style={{ animationDuration: '8s' }} />
               <span>Vòng Quay</span>
             </button>
           )}
@@ -139,13 +139,13 @@ export default function Navbar({
           {onOpenPeriodTracker && (
             <button
               onClick={onOpenPeriodTracker}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-rose-300 border border-pink-500/30 text-xs font-semibold transition-all transform hover:scale-105"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 text-rose-300 border border-pink-500/30 text-xs font-semibold transition-all transform hover:scale-105 whitespace-nowrap shrink-0"
               title="Góc chăm sóc nàng (Đếm ngược & Nhắc nhở yêu thương)"
             >
-              <span>🌸</span>
-              <span className="hidden sm:inline">Ngày Của Nàng</span>
+              <span className="shrink-0">🌸</span>
+              <span className="hidden xl:inline">Ngày Nàng</span>
               {periodCycleInfo && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-rose-500/30 text-rose-200 font-mono">
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/30 text-rose-200 font-mono whitespace-nowrap shrink-0">
                   {periodCycleInfo.statusBadgeText}
                 </span>
               )}
@@ -155,14 +155,14 @@ export default function Navbar({
           {/* Create Button */}
           <button
             onClick={onOpenCreate}
-            className="flex items-center gap-2 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white px-3.5 sm:px-4 py-2.5 rounded-xl font-semibold shadow-lg shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 text-sm"
+            className="flex items-center gap-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-semibold shadow-lg shadow-rose-500/25 transition-all transform hover:scale-105 active:scale-95 text-xs sm:text-sm whitespace-nowrap shrink-0"
           >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span className="hidden sm:inline">Tạo Mục Mới</span>
+            <Plus className="w-4 h-4 stroke-[3] shrink-0" />
+            <span className="hidden sm:inline">Tạo Mục</span>
           </button>
 
           {/* Notifications Dropdown */}
-          <div className="relative">
+          <div className="relative shrink-0">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
               className="relative p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors border border-slate-700/60"
@@ -222,7 +222,7 @@ export default function Navbar({
       </div>
 
       {/* Mobile Tab Switcher */}
-      <div className="md:hidden flex border-t border-slate-800 bg-slate-900/90 px-3 py-2 justify-around text-xs">
+      <div className="lg:hidden flex border-t border-slate-800 bg-slate-900/90 px-3 py-2 justify-around text-xs">
         <button
           onClick={() => setActiveTab('calendar')}
           className={`flex flex-col items-center gap-1 py-1 ${activeTab === 'calendar' ? 'text-rose-400 font-bold' : 'text-slate-400'}`}
