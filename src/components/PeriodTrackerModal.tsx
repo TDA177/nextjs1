@@ -15,12 +15,27 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { calculateCycleInfo, CycleCalculationResult } from '@/lib/periodUtils';
+import { calculateCycleInfo, CycleCalculationResult, getVietnamDate } from '@/lib/periodUtils';
 
 interface PeriodTrackerModalProps {
   initialSetting: any | null;
   onClose: () => void;
   onRefresh: () => void;
+}
+
+function toDateInputValue(dateInput?: Date | string | null): string {
+  if (!dateInput) {
+    const now = getVietnamDate(new Date());
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+  const dateObj = getVietnamDate(dateInput);
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 export default function PeriodTrackerModal({
@@ -30,12 +45,8 @@ export default function PeriodTrackerModal({
 }: PeriodTrackerModalProps) {
   const [activeView, setActiveView] = useState<'status' | 'settings'>('status');
 
-  // Form states
-  const [startDate, setStartDate] = useState(
-    initialSetting?.startDate
-      ? new Date(initialSetting.startDate).toISOString().split('T')[0]
-      : new Date().toISOString().split('T')[0]
-  );
+  // Form states (sử dụng ngày chuẩn Việt Nam không bị lệch giờ UTC)
+  const [startDate, setStartDate] = useState(toDateInputValue(initialSetting?.startDate));
   const [cycleLength, setCycleLength] = useState<number>(initialSetting?.cycleLength || 28);
   const [reminderDaysBefore, setReminderDaysBefore] = useState<number>(
     initialSetting?.reminderDaysBefore || 3
@@ -47,9 +58,15 @@ export default function PeriodTrackerModal({
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // If no initial setting, default to settings view
+  // If initialSetting changes or is null, update form
   useEffect(() => {
-    if (!initialSetting) {
+    if (initialSetting?.startDate) {
+      setStartDate(toDateInputValue(initialSetting.startDate));
+      setCycleLength(initialSetting.cycleLength || 28);
+      setReminderDaysBefore(initialSetting.reminderDaysBefore || 3);
+      setPartnerName(initialSetting.partnerName || 'Em');
+      setNotes(initialSetting.notes || '');
+    } else {
       setActiveView('settings');
     }
   }, [initialSetting]);

@@ -100,7 +100,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ngày bắt đầu kỳ kinh là bắt buộc' }, { status: 400 });
     }
 
-    const parsedStartDate = new Date(startDate);
+    const dateStr = typeof startDate === 'string' ? startDate.split('T')[0] : new Date(startDate).toISOString().split('T')[0];
+    const parsedStartDate = new Date(`${dateStr}T00:00:00.000Z`);
     const parsedCycleLength = parseInt(cycleLength, 10) || 28;
     const parsedReminderDays = parseInt(reminderDaysBefore, 10) || 3;
 

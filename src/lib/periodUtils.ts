@@ -1,7 +1,6 @@
 import {
   addDays,
   differenceInCalendarDays,
-  startOfDay,
   format,
 } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -36,6 +35,30 @@ export const PERIOD_FOOD_TIPS = [
 ];
 
 /**
+ * Chuyển đổi mọi định dạng ngày (string ISO, Date, string YYYY-MM-DD) về ngày thuần lịch theo múi giờ Việt Nam (UTC+7).
+ * Triệt tiêu hoàn toàn lỗi lệch 1 ngày do chuyển đổi múi giờ UTC/Local (ví dụ: 17:00Z làm nhảy sang ngày 26).
+ */
+export function getVietnamDate(dateInput: Date | string | number): Date {
+  if (typeof dateInput === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateInput.trim())) {
+    const [y, m, d] = dateInput.trim().split('-').map(Number);
+    return new Date(y, m - 1, d, 0, 0, 0, 0);
+  }
+  const d = new Date(dateInput);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+  });
+  const parts = formatter.formatToParts(d);
+  const map: Record<string, string> = {};
+  for (const p of parts) {
+    if (p.type !== 'literal') map[p.type] = p.value;
+  }
+  return new Date(parseInt(map.year, 10), parseInt(map.month, 10) - 1, parseInt(map.day, 10), 0, 0, 0, 0);
+}
+
+/**
  * Tính toán chu kỳ 28 ngày (hoặc tùy chỉnh) - Đếm ngày của nàng
  */
 export function calculateCycleInfo(
@@ -44,8 +67,8 @@ export function calculateCycleInfo(
   periodDuration?: number,
   targetDateInput: Date = new Date()
 ): CycleCalculationResult {
-  const baseStart = startOfDay(new Date(startDateInput));
-  const target = startOfDay(targetDateInput);
+  const baseStart = getVietnamDate(startDateInput);
+  const target = getVietnamDate(targetDateInput);
 
   const cycleLen = Math.max(20, Math.min(45, cycleLength || 28));
 
@@ -119,7 +142,7 @@ export interface DayCycleMarker {
 
 /**
  * Lấy đánh dấu ngày của nàng (dùng cho Calendar)
- * Chỉ hiển thị đúng ngày bắt đầu của chu kỳ, không hiển thị các ngày phụ hay rụng trứng.
+ * Chỉ hiển thị đúng ngày bắt đầu của chu kỳ, chuẩn xác theo múi giờ Việt Nam.
  */
 export function getCycleDayMarker(
   targetDate: Date,
@@ -127,8 +150,8 @@ export function getCycleDayMarker(
   cycleLength: number = 28,
   periodDuration?: number
 ): DayCycleMarker | null {
-  const baseStart = startOfDay(new Date(startDateInput));
-  const target = startOfDay(targetDate);
+  const baseStart = getVietnamDate(startDateInput);
+  const target = getVietnamDate(targetDate);
   const cycleLen = Math.max(20, Math.min(45, cycleLength || 28));
 
   const diffDays = differenceInCalendarDays(target, baseStart);

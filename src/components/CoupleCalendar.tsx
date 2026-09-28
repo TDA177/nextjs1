@@ -223,7 +223,7 @@ export default function CoupleCalendar({
               <div
                 key={idx}
                 onClick={() => setSelectedDay(day)}
-                className={`min-h-[110px] sm:min-h-[130px] p-2 transition-all cursor-pointer flex flex-col justify-between group relative ${
+                className={`min-h-[110px] sm:min-h-[130px] p-1.5 sm:p-2 transition-all cursor-pointer flex flex-col justify-between group relative overflow-hidden ${
                   !isCurrMonth
                     ? 'bg-slate-900/40 text-slate-600'
                     : isPeriodStartDay
@@ -232,9 +232,9 @@ export default function CoupleCalendar({
                 } ${isTodayDate ? 'ring-2 ring-rose-500/80 z-10 bg-rose-950/20' : ''}`}
               >
                 {/* Date header */}
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-1 gap-1">
                   <span
-                    className={`text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center ${
+                    className={`text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
                       isTodayDate
                         ? 'bg-rose-500 text-white shadow-md shadow-rose-500/40'
                         : isPeriodStartDay
@@ -247,7 +247,7 @@ export default function CoupleCalendar({
                     {format(day, 'd')}
                   </span>
 
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 overflow-hidden shrink-0">
                     {/* Quick Add Button on Hover */}
                     {onOpenCreateDate && (
                       <button
@@ -266,15 +266,16 @@ export default function CoupleCalendar({
                     {/* Period Start Day Icon */}
                     {isPeriodStartDay && (
                       <span
-                        className="text-[11px] px-1.5 py-0.5 rounded-md bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold"
-                        title={cycleMarker?.label}
+                        className="text-[10px] sm:text-[11px] px-1 sm:px-1.5 py-0.5 rounded-md bg-rose-500/30 text-rose-200 border border-rose-500/40 font-bold flex items-center gap-0.5 shrink-0"
+                        title="Ngày của nàng 🌸"
                       >
-                        🌸 Ngày của nàng
+                        <span>🌸</span>
+                        <span className="hidden xl:inline whitespace-nowrap">Ngày của nàng</span>
                       </span>
                     )}
 
                     {dayItems.length > 0 && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 shrink-0">
                         {dayItems.length}
                       </span>
                     )}
