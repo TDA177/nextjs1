@@ -1,4 +1,4 @@
-import { differenceInDays, differenceInMonths, differenceInYears, addDays, isPast, isToday } from 'date-fns';
+import { differenceInDays, differenceInMonths, differenceInYears, addDays, addYears } from 'date-fns';
 
 export interface Milestone {
   targetDays: number;
@@ -18,24 +18,43 @@ export interface LoveStats {
   progressToNext: number; // 0 to 100
 }
 
-const COMMON_MILESTONES = [
+interface MilestoneDef {
+  years?: number;
+  days?: number;
+  label: string;
+}
+
+const COMMON_MILESTONES: MilestoneDef[] = [
   { days: 100, label: '100 Ngày Yêu' },
   { days: 200, label: '200 Ngày Yêu' },
   { days: 300, label: '300 Ngày Yêu' },
-  { days: 365, label: '1 Năm Kỷ Niệm (365 Ngày)' },
+  { years: 1, label: '1 Năm Kỷ Niệm (365 Ngày)' },
   { days: 500, label: '500 Ngày Yêu' },
-  { days: 730, label: '2 Năm Kỷ Niệm (730 Ngày)' },
+  { years: 2, label: '2 Năm Kỷ Niệm (730 Ngày)' },
   { days: 1000, label: '1.000 Ngày Bên Nhau' },
-  { days: 1095, label: '3 Năm Kỷ Niệm (1.095 Ngày)' },
+  { years: 3, label: '3 Năm Kỷ Niệm (1.095 Ngày)' },
   { days: 1500, label: '1.500 Ngày Yêu' },
-  { days: 1825, label: '5 Năm Bền Chặt (1.825 Ngày)' },
+  { years: 5, label: '5 Năm Bền Chặt (1.825 Ngày)' },
   { days: 2500, label: '2.500 Ngày Yêu' },
-  { days: 3650, label: '10 Năm Đậm Sâu (3.650 Ngày)' },
+  { years: 10, label: '10 Năm Đậm Sâu (3.650 Ngày)' },
 ];
 
+function parseDateOnly(dateInput: string | Date): Date {
+  if (dateInput instanceof Date) {
+    return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
+  }
+  if (typeof dateInput === 'string') {
+    const match = dateInput.split('T')[0].match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      return new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10));
+    }
+  }
+  const d = new Date(dateInput);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
 export function calculateLoveStats(startDateStr: string | Date): LoveStats {
-  const start = new Date(startDateStr);
-  start.setHours(0, 0, 0, 0);
+  const start = parseDateOnly(startDateStr);
 
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -46,8 +65,7 @@ export function calculateLoveStats(startDateStr: string | Date): LoveStats {
 
   // Tính năm, tháng, ngày tương đối
   const years = differenceInYears(today, start);
-  const startPlusYears = new Date(start);
-  startPlusYears.setFullYear(startPlusYears.getFullYear() + years);
+  const startPlusYears = addYears(start, years);
 
   const months = differenceInMonths(today, startPlusYears);
   const startPlusMonths = new Date(startPlusYears);
@@ -60,12 +78,24 @@ export function calculateLoveStats(startDateStr: string | Date): LoveStats {
   let nextMilestone: Milestone | null = null;
 
   const milestones: Milestone[] = COMMON_MILESTONES.map((m) => {
-    const targetDate = addDays(start, m.days - 1);
+    let targetDate: Date;
+    let targetDays: number;
+
+    if (m.years) {
+      // Mốc năm kỷ niệm (Anniversary) luôn rơi vào đúng ngày đó ở năm sau
+      targetDate = addYears(start, m.years);
+      targetDays = differenceInDays(targetDate, start) + 1;
+    } else {
+      // Mốc theo số ngày yêu (ngày thứ N)
+      targetDays = m.days!;
+      targetDate = addDays(start, m.days! - 1);
+    }
+
     const daysLeft = Math.ceil((targetDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     const isReached = daysLeft <= 0;
 
     const ms: Milestone = {
-      targetDays: m.days,
+      targetDays,
       label: m.label,
       targetDate,
       daysLeft: Math.max(0, daysLeft),
@@ -73,7 +103,7 @@ export function calculateLoveStats(startDateStr: string | Date): LoveStats {
     };
 
     if (isReached) {
-      prevMilestoneDays = m.days;
+      prevMilestoneDays = targetDays;
     } else if (!nextMilestone) {
       nextMilestone = ms;
     }
@@ -98,7 +128,7 @@ export function calculateLoveStats(startDateStr: string | Date): LoveStats {
   // Tính progress bar đến next milestone (0 - 100%)
   const span = nextMilestone.targetDays - prevMilestoneDays;
   const currentInSpan = totalDays - prevMilestoneDays;
-  const progressToNext = Math.min(100, Math.max(0, Math.round((currentInSpan / span) * 100)));
+  const progressToNext = span > 0 ? Math.min(100, Math.max(0, Math.round((currentInSpan / span) * 100))) : 100;
 
   return {
     totalDays,
