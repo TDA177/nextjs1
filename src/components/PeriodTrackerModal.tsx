@@ -116,35 +116,49 @@ export default function PeriodTrackerModal({
     }
   };
 
+  // Close on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const cycleDay = previewCycleInfo?.currentCycleDay || 1;
   const totalDays = previewCycleInfo?.totalCycleDays || 28;
   const cycleProgressPct = Math.min(100, Math.round((cycleDay / totalDays) * 100));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-fadeIn">
-      <div className="glass-modal rounded-3xl w-full max-w-2xl border border-rose-500/40 shadow-2xl space-y-6 relative max-h-[92vh] overflow-y-auto p-6">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-fadeIn"
+    >
+      <div className="glass-modal rounded-3xl w-full max-w-2xl border border-rose-500/40 shadow-2xl space-y-6 relative max-h-[92vh] overflow-y-auto p-4 sm:p-6">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-700/60 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-700/60 pb-4 gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 rounded-2xl text-white shadow-lg shadow-rose-500/25 animate-pulse">
-              <Heart className="w-6 h-6 fill-white" />
+            <div className="p-2.5 sm:p-3 bg-gradient-to-br from-rose-500 via-pink-500 to-purple-600 rounded-2xl text-white shadow-lg shadow-rose-500/25 shrink-0">
+              <Heart className="w-5 h-5 sm:w-6 sm:h-6 fill-white" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-xl font-black text-white">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-black text-white">
                   Góc Của {partnerName || 'Em'} 🌸
                 </h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 whitespace-nowrap">
                   Chu kỳ {cycleLength} ngày
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 mt-0.5">
                 Tự động lặp lại sau mỗi {cycleLength} ngày & thông báo đếm ngược
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
             {initialSetting && (
               <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
                 <button

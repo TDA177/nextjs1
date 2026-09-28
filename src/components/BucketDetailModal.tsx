@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   Calendar,
@@ -257,12 +257,26 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
     }
   };
 
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !showCreateMemoryModal) onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose, showCreateMemoryModal]);
+
   const checklists = item.checklists || [];
   const doneChecklists = checklists.filter((c: any) => c.isCompleted).length;
   const progressPct = checklists.length > 0 ? Math.round((doneChecklists / checklists.length) * 100) : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-lg animate-fadeIn">
+    <div
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !showCreateMemoryModal) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-lg animate-fadeIn"
+    >
       <div className="glass-modal rounded-3xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-rose-500/30 shadow-2xl overflow-hidden relative">
         {/* Header */}
         <div className="p-6 border-b border-slate-700/60 bg-slate-900/60 flex items-start justify-between gap-4">

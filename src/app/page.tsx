@@ -41,6 +41,7 @@ export default function Home() {
   const [createInitialDate, setCreateInitialDate] = useState<Date | null>(null);
   const [createInitialTitle, setCreateInitialTitle] = useState('');
   const [createInitialType, setCreateInitialType] = useState('Bucket');
+  const [isMounted, setIsMounted] = useState(false);
 
   // Fetch all planner items
   const fetchItems = async () => {
@@ -107,6 +108,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    setIsMounted(true);
     fetchItems();
     fetchPeriod();
     fetchProfile();
@@ -132,8 +134,17 @@ export default function Home() {
   const unreadNotificationsCount = notifications.filter((n) => !n.isRead).length;
   const loveDaysCount = profile?.startDate ? calculateLoveStats(profile.startDate).totalDays : undefined;
 
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-rose-300 gap-3">
+        <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-sm font-semibold">Đang tải Couple Planner...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen pb-16">
+    <div className="min-h-screen pb-24 md:pb-12">
       {/* Top Navbar */}
       <Navbar
         activeTab={activeTab}
@@ -282,7 +293,7 @@ export default function Home() {
       {/* Floating AI Chat Assistant Button with Fox Mascot */}
       <button
         onClick={() => setShowAIChatModal(true)}
-        className="fixed bottom-6 right-6 z-40 group flex items-center gap-2 pl-2 pr-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
+        className="fixed bottom-16 sm:bottom-6 right-4 sm:right-6 z-30 group flex items-center gap-2 pl-2 pr-4 py-2 bg-gradient-to-r from-rose-500 via-pink-500 to-amber-400 text-white font-medium rounded-full shadow-lg shadow-rose-500/30 hover:shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 transition-all"
         title="Hỏi trợ lý Haha về ngày lễ, lịch hẹn"
       >
         <div className="relative w-11 h-11 flex items-center justify-center -my-1.5">
