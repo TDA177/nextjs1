@@ -11,6 +11,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
         events: { orderBy: { eventStart: 'asc' } },
         comments: { orderBy: { createdAt: 'desc' } },
         attachments: { orderBy: { createdAt: 'desc' } },
+        memories: { orderBy: { date: 'desc' } },
       },
     });
 
@@ -63,6 +64,7 @@ export async function PUT(request: Request, { params }: { params: { id: string }
         events: true,
         comments: true,
         attachments: true,
+        memories: true,
       },
     });
 

@@ -12,11 +12,12 @@ import LoveCounterModal from '@/components/LoveCounterModal';
 import DateRouletteModal from '@/components/DateRouletteModal';
 import AIChatModal from '@/components/AIChatModal';
 import AnimatedMascot from '@/components/AnimatedMascot';
+import LoveTimeline from '@/components/LoveTimeline';
 import { calculateLoveStats } from '@/lib/loveUtils';
 import { Sparkles } from 'lucide-react';
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets'>('calendar');
+  const [activeTab, setActiveTab] = useState<'calendar' | 'dashboard' | 'buckets' | 'memories'>('calendar');
   const [currentUser, setCurrentUser] = useState(USERS[0]); // Trường by default
 
   const [items, setItems] = useState<any[]>([]);
@@ -203,6 +204,15 @@ export default function Home() {
                 profile={profile}
                 onOpenLoveModal={() => setShowLoveModal(true)}
                 onOpenRouletteModal={() => setShowRouletteModal(true)}
+              />
+            )}
+
+            {activeTab === 'memories' && (
+              <LoveTimeline
+                currentUser={currentUser}
+                profile={profile}
+                completedItems={items.filter((i) => i.status === 'Completed')}
+                onOpenItemDetail={(item) => setSelectedItem(item)}
               />
             )}
           </>

@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     let coupleContext = '';
     try {
       const todayVN = toVietnamStartOfDay(now);
-      const [profile, rawUpcomingItems, periodSetting] = await Promise.all([
+      const [profile, rawUpcomingItems, periodSetting, recentMemories] = await Promise.all([
         prisma.coupleProfile.findFirst({ where: { coupleId: 'couple-1' } }),
         prisma.plannerItem.findMany({
           where: {
@@ -52,6 +52,11 @@ export async function POST(req: NextRequest) {
           take: 15,
         }),
         prisma.periodSetting.findFirst({ where: { coupleId: 'couple-1' } }),
+        prisma.coupleMemory.findMany({
+          where: { coupleId: 'couple-1' },
+          orderBy: { date: 'desc' },
+          take: 5,
+        }),
       ]);
 
       // Lọc các sự kiện diễn ra từ hôm nay trở đi theo lịch Việt Nam
@@ -94,6 +99,14 @@ export async function POST(req: NextRequest) {
         coupleContext += `\n- Chu kỳ của bạn gái (${periodSetting.partnerName}):`;
         coupleContext += `\n  + Dự kiến kỳ kinh tiếp theo: ${formatFriendlyDate(cycleInfo.nextPeriodStartDate)} (còn ${cycleInfo.daysUntilNextPeriod} ngày nữa)`;
         coupleContext += `\n  + Tình trạng hôm nay: Ngày thứ ${cycleInfo.currentCycleDay}/${cycleInfo.totalCycleDays} của chu kỳ (${cycleInfo.statusBadgeText})`;
+      }
+
+      // Context Kỷ niệm / Album
+      if (recentMemories && recentMemories.length > 0) {
+        coupleContext += `\n- Các khoảnh khắc/kỷ niệm đáng nhớ gần đây của 2 bạn:`;
+        for (const mem of recentMemories) {
+          coupleContext += `\n  + "${mem.title}" (${formatFriendlyDate(mem.date)}): Cảm xúc: ${mem.emotion || 'Hạnh phúc'}${mem.location ? ` tại ${mem.location}` : ''}${mem.note ? ` - Lời nhắn: "${mem.note}"` : ''}`;
+        }
       }
     } catch (dbErr) {
       console.warn('Lỗi đọc database context (tiếp tục với dữ liệu lịch):', dbErr);

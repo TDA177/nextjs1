@@ -32,6 +32,7 @@ model PlannerItem {
   comments    PlannerComment[]
   attachments PlannerAttachment[]
   notifications Notification[]
+  memories    CoupleMemory[]
 }
 
 model PlannerChecklist {
@@ -137,4 +138,21 @@ model RouletteCustomItem {
   title     String
   createdAt DateTime @default(now())
 }
+
+model CoupleMemory {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  coupleId      String       @default("couple-1")
+  plannerItemId String?      @db.ObjectId
+  plannerItem   PlannerItem? @relation(fields: [plannerItemId], references: [id], onDelete: SetNull)
+  title         String
+  date          DateTime     @default(now())
+  photos        String[]     // Danh sách link ảnh hoặc base64
+  emotion       String?      // 🥰 Hạnh phúc, 💖 Lãng mạn, 🌿 Bình yên, 🥳 Siêu vui, 🥺 Cảm động, 😂 Hài hước...
+  note          String?      // Cảm nghĩ, kỷ niệm, câu chuyện
+  location      String?
+  authorName    String       @default("Anh")
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
 

@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Compass } from 'lucide-react';
+import { Heart, Bell, Plus, Calendar as CalendarIcon, LayoutDashboard, Sparkles, CheckCheck, Compass, Camera } from 'lucide-react';
 
 interface NavbarProps {
-  activeTab: 'calendar' | 'dashboard' | 'buckets';
-  setActiveTab: (tab: 'calendar' | 'dashboard' | 'buckets') => void;
+  activeTab: 'calendar' | 'dashboard' | 'buckets' | 'memories';
+  setActiveTab: (tab: 'calendar' | 'dashboard' | 'buckets' | 'memories') => void;
   currentUser: { id: string; name: string; avatar: string };
   setCurrentUser: (user: { id: string; name: string; avatar: string }) => void;
   onOpenCreate: () => void;
@@ -93,6 +93,17 @@ export default function Navbar({
           >
             <LayoutDashboard className="w-4 h-4" />
             Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab('memories')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              activeTab === 'memories'
+                ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/40'
+            }`}
+          >
+            <Camera className="w-4 h-4" />
+            Kỷ Niệm (Memories)
           </button>
         </nav>
 
@@ -232,6 +243,13 @@ export default function Navbar({
         >
           <LayoutDashboard className="w-4 h-4" />
           Dashboard
+        </button>
+        <button
+          onClick={() => setActiveTab('memories')}
+          className={`flex flex-col items-center gap-1 py-1 ${activeTab === 'memories' ? 'text-rose-400 font-bold' : 'text-slate-400'}`}
+        >
+          <Camera className="w-4 h-4" />
+          Kỷ Niệm
         </button>
         {onOpenRouletteModal && (
           <button

@@ -17,6 +17,7 @@ export async function GET(request: Request) {
         events: { orderBy: { eventStart: 'asc' } },
         comments: { orderBy: { createdAt: 'desc' } },
         attachments: { orderBy: { createdAt: 'desc' } },
+        memories: { orderBy: { date: 'desc' } },
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -79,6 +80,7 @@ export async function POST(request: Request) {
         events: true,
         comments: true,
         attachments: true,
+        memories: true,
       },
     });
 

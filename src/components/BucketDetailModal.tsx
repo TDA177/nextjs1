@@ -20,8 +20,13 @@ import {
   Tag,
   MapPin,
   Flame,
+  Camera,
+  Edit3,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { format } from 'date-fns';
+import { vi } from 'date-fns/locale';
+import CreateMemoryModal, { MEMORY_EMOTIONS } from './CreateMemoryModal';
 
 interface BucketDetailModalProps {
   item: any;
@@ -31,7 +36,34 @@ interface BucketDetailModalProps {
 }
 
 export default function BucketDetailModal({ item, currentUser, onClose, onRefresh }: BucketDetailModalProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'checklist' | 'events' | 'comments' | 'attachments'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'checklist' | 'events' | 'comments' | 'attachments' | 'memories'>('overview');
+
+  // Memories linked to this item
+  const [itemMemories, setItemMemories] = useState<any[]>(item.memories || []);
+  const [editingMemory, setEditingMemory] = useState<any | null>(null);
+
+  // Memory Prompt & Modal state
+  const [showSaveMemoryPrompt, setShowSaveMemoryPrompt] = useState(false);
+  const [showCreateMemoryModal, setShowCreateMemoryModal] = useState(false);
+
+  // Fetch memories for this item
+  const fetchItemMemories = async () => {
+    try {
+      const res = await fetch(`/api/memories?plannerItemId=${item.id}&coupleId=couple-1`);
+      if (res.ok) {
+        const data = await res.json();
+        setItemMemories(data);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  React.useEffect(() => {
+    if (item?.id) {
+      fetchItemMemories();
+    }
+  }, [item?.id]);
 
   // Checklist state
   const [newChecklistTitle, setNewChecklistTitle] = useState('');
@@ -65,6 +97,7 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
       if (res.ok) {
         if (newStatus === 'Completed') {
           confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          setShowSaveMemoryPrompt(true);
         }
         onRefresh();
       }
@@ -269,6 +302,114 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
           </button>
         </div>
 
+        {/* Completed Memory Section: Synced Memories or Prompt to Add */}
+        {itemMemories.length > 0 ? (
+          <div className="mx-6 mt-4 p-4 bg-gradient-to-br from-rose-950/70 via-slate-900/90 to-purple-950/70 border border-rose-500/40 rounded-2xl shadow-xl space-y-3 animate-fadeIn">
+            <div className="flex items-center justify-between pb-2 border-b border-rose-500/20">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-rose-500 to-purple-600 text-white flex items-center justify-center text-xs shadow-md shadow-rose-500/30">
+                  <Camera className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-white flex items-center gap-2">
+                    Kỷ niệm đã đồng bộ lên Dòng Thời Gian ({itemMemories.length})
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-medium">
+                      Love Timeline
+                    </span>
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setEditingMemory(null);
+                  setShowCreateMemoryModal(true);
+                }}
+                className="px-2.5 py-1 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-[11px] font-semibold transition-colors flex items-center gap-1"
+              >
+                + Thêm kỷ niệm khác
+              </button>
+            </div>
+
+            {/* List of synced memories for this item */}
+            <div className="space-y-3">
+              {itemMemories.map((mem) => {
+                const emConfig = MEMORY_EMOTIONS.find((e) => e.id === mem.emotion) || MEMORY_EMOTIONS[0];
+                const formattedDate = format(new Date(mem.date), 'EEEE, dd/MM/yyyy', { locale: vi });
+                return (
+                  <div key={mem.id} className="p-3.5 bg-slate-900/80 rounded-xl border border-slate-700/60 space-y-2.5 hover:border-rose-500/40 transition-colors">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${emConfig.color}`}>
+                          <span>{emConfig.emoji}</span>
+                          <span>{emConfig.label}</span>
+                        </span>
+                        <span className="text-[11px] text-slate-300 font-medium capitalize">
+                          {formattedDate}
+                        </span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                          Chia sẻ bởi: {mem.authorName} ❤️
+                        </span>
+                        <button
+                          onClick={() => {
+                            setEditingMemory(mem);
+                            setShowCreateMemoryModal(true);
+                          }}
+                          className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                          title="Chỉnh sửa kỷ niệm"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {mem.note && (
+                      <p className="text-xs text-rose-100 italic bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/20 leading-relaxed">
+                        “{mem.note}”
+                      </p>
+                    )}
+
+                    {mem.photos && mem.photos.length > 0 && (
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
+                        {mem.photos.map((p: string, pIdx: number) => (
+                          <div key={pIdx} className="aspect-square rounded-xl overflow-hidden border border-slate-700">
+                            <img src={p} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {mem.location && (
+                      <div className="flex items-center gap-1.5 text-xs text-slate-300">
+                        <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                        <span>{mem.location}</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : item.status === 'Completed' ? (
+          <div className="mx-6 mt-4 p-3.5 bg-gradient-to-r from-rose-950/60 via-purple-950/60 to-slate-900 border border-rose-500/30 rounded-2xl flex items-center justify-between gap-3 shadow-md">
+            <div className="flex items-center gap-2.5 text-xs text-rose-200">
+              <Camera className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>Kế hoạch này đã hoàn thành! Lưu lại ảnh & cảm xúc kỷ niệm nhé?</span>
+            </div>
+            <button
+              onClick={() => {
+                setEditingMemory(null);
+                setShowCreateMemoryModal(true);
+              }}
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-semibold shadow-md whitespace-nowrap transition-transform hover:scale-105 active:scale-95"
+            >
+              + Lưu Kỷ Niệm
+            </button>
+          </div>
+        ) : null}
+
         {/* Error Alert Box */}
         {errorMessage && (
           <div className="m-4 p-4 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-200 text-xs flex items-center gap-3">
@@ -287,6 +428,15 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
             }`}
           >
             Tổng Quan & Trạng Thái
+          </button>
+          <button
+            onClick={() => setActiveTab('memories')}
+            className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              activeTab === 'memories' ? 'bg-gradient-to-r from-rose-500 to-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Camera className="w-3.5 h-3.5" />
+            Kỷ Niệm ({itemMemories.length})
           </button>
           <button
             onClick={() => setActiveTab('checklist')}
@@ -626,6 +776,122 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
               </form>
             </div>
           )}
+
+          {/* TAB 6: KỶ NIỆM (MEMORIES) */}
+          {activeTab === 'memories' && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div>
+                  <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                    📸 Kỷ Niệm Của Kế Hoạch Này
+                    <span className="text-xs font-normal text-rose-300 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+                      {itemMemories.length} khoảnh khắc
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Các ảnh, cảm xúc và câu chuyện được đồng bộ tự động với Dòng Thời Gian tình yêu
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setEditingMemory(null);
+                    setShowCreateMemoryModal(true);
+                  }}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-semibold shadow-md flex items-center gap-1.5 transition-transform hover:scale-105"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>+ Lưu Kỷ Niệm Mới</span>
+                </button>
+              </div>
+
+              {itemMemories.length === 0 ? (
+                <div className="text-center py-12 px-4 bg-slate-800/20 border border-dashed border-slate-700 rounded-2xl">
+                  <Camera className="w-10 h-10 text-slate-500 mx-auto mb-2" />
+                  <p className="text-xs text-slate-300 font-semibold mb-1">Chưa có kỷ niệm nào cho kế hoạch này</p>
+                  <p className="text-[11px] text-slate-400 mb-4 max-w-sm mx-auto">
+                    Sau khi hoàn thành hoặc đi chơi cùng nhau, hãy đăng ảnh và cảm nghĩ để lưu giữ khoảnh khắc ngọt ngào nhé!
+                  </p>
+                  <button
+                    onClick={() => {
+                      setEditingMemory(null);
+                      setShowCreateMemoryModal(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold transition-colors"
+                  >
+                    + Thêm Kỷ Niệm Đầu Tiên
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {itemMemories.map((mem) => {
+                    const emConfig = MEMORY_EMOTIONS.find((e) => e.id === mem.emotion) || MEMORY_EMOTIONS[0];
+                    const formattedDate = format(new Date(mem.date), 'EEEE, dd/MM/yyyy', { locale: vi });
+                    return (
+                      <div
+                        key={mem.id}
+                        className="p-4 bg-slate-800/40 border border-slate-700/60 rounded-2xl space-y-3 hover:border-rose-500/40 transition-colors"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${emConfig.color}`}>
+                              <span>{emConfig.emoji}</span>
+                              <span>{emConfig.label}</span>
+                            </span>
+                            <span className="text-xs font-semibold text-slate-200 capitalize">
+                              {formattedDate}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-rose-300 bg-rose-500/10 px-2.5 py-0.5 rounded-full border border-rose-500/20">
+                              {mem.authorName} ❤️
+                            </span>
+                            <button
+                              onClick={() => {
+                                setEditingMemory(mem);
+                                setShowCreateMemoryModal(true);
+                              }}
+                              className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+                              title="Chỉnh sửa kỷ niệm"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {mem.title && mem.title !== `Kỷ niệm: ${item.title}` && (
+                          <h5 className="text-sm font-bold text-white">{mem.title}</h5>
+                        )}
+
+                        {mem.note && (
+                          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-100 italic leading-relaxed">
+                            “{mem.note}”
+                          </div>
+                        )}
+
+                        {mem.photos && mem.photos.length > 0 && (
+                          <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 pt-1">
+                            {mem.photos.map((photoUrl: string, pIdx: number) => (
+                              <div key={pIdx} className="aspect-square rounded-xl overflow-hidden border border-slate-700 bg-slate-900">
+                                <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {mem.location && (
+                          <div className="flex items-center gap-1.5 text-xs text-slate-300">
+                            <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                            <span>{mem.location}</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -659,6 +925,59 @@ export default function BucketDetailModal({ item, currentUser, onClose, onRefres
             </div>
           </div>
         </div>
+      )}
+
+      {/* PROMPT LƯU KỶ NIỆM KHI HOÀN THÀNH */}
+      {showSaveMemoryPrompt && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-lg animate-fadeIn">
+          <div className="glass-modal rounded-3xl p-6 max-w-md w-full border border-rose-500/40 text-center space-y-4 shadow-2xl">
+            <div className="w-16 h-16 bg-gradient-to-tr from-rose-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto shadow-lg shadow-rose-500/30">
+              <Camera className="w-8 h-8" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Hoàn Thành Kế Hoạch! 🎉</h3>
+            <p className="text-slate-300 text-xs leading-relaxed">
+              Bạn có muốn lưu lại hình ảnh & cảm xúc về <strong>[{item.title}]</strong> vào <strong>Dòng Thời Gian Tình Yêu</strong> ngay không?
+            </p>
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                onClick={() => {
+                  setShowSaveMemoryPrompt(false);
+                  setShowCreateMemoryModal(true);
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 hover:from-rose-600 hover:to-purple-700 text-white text-xs font-bold transition-all shadow-lg shadow-rose-500/25 flex items-center justify-center gap-1.5"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span>Lưu Kỷ Niệm Ngay</span>
+              </button>
+              <button
+                onClick={() => setShowSaveMemoryPrompt(false)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold"
+              >
+                Để sau nhé
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL TẠO KỶ NIỆM TỪ ITEM */}
+      {showCreateMemoryModal && (
+        <CreateMemoryModal
+          isOpen={showCreateMemoryModal}
+          onClose={() => {
+            setShowCreateMemoryModal(false);
+            setEditingMemory(null);
+          }}
+          onSuccess={() => {
+            setShowCreateMemoryModal(false);
+            setEditingMemory(null);
+            fetchItemMemories();
+            onRefresh();
+          }}
+          initialItem={item}
+          currentUser={currentUser}
+          memoryToEdit={editingMemory}
+        />
       )}
     </div>
   );
